@@ -1,0 +1,6 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/menu_add_schedule"
+        android:title="일정 추가"/>
+    <item android:id="@+id/menu_add_memo"
+        android:title="메모 추가"/>
+</menu>

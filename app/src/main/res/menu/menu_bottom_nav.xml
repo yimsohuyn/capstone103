@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/tab_schedule"  android:title="일정"/>
+    <item android:id="@+id/tab_tasks"     android:title="과제"/>
+    <item android:id="@+id/tab_notes"     android:title="필기요약"/>
+    <item android:id="@+id/tab_analytics" android:title="학습 분석"/>
+    <item android:id="@+id/tab_settings"  android:title="설정"/>
+</menu>

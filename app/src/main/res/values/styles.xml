@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- 🌙 기본 앱 테마 (자동 생성된 거 그대로 두세요) -->
+    <style name="Theme.AndroidTest" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/purple_500</item>
+        <item name="colorSecondary">@color/teal_200</item>
+    </style>
+
+    <style name="BottomNavTextActive" parent="@style/TextAppearance.Material3.BodyMedium">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <!-- 비선택 탭 -->
+    <style name="BottomNavTextInactive" parent="@style/TextAppearance.Material3.BodyMedium">
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+<!--    &lt;!&ndash; ✅ 선택 시 배경 하이라이트(둥근 색 배경) 제거 &ndash;&gt;-->
+<!--    <style name="BottomNavActiveIndicator.None">-->
+<!--        <item name="android:color">@android:color/transparent</item>-->
+<!--    </style>-->
+
+</resources>
