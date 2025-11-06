@@ -4,11 +4,22 @@ plugins {
     alias(libs.plugins.kotlin.compose)
 }
 
+
+
 android {
     namespace = "com.example.myapplication"
     compileSdk {
         version = release(36)
     }
+
+//    signingConfigs {
+//        getByName("debug") {
+//            storeFile = file("../team_keystore/teamkey.jks")
+//            storePassword = "capstone103"
+//            keyAlias = "teamKey"
+//            keyPassword = "capstone103"
+//        }
+//    }
 
     defaultConfig {
         applicationId = "com.example.myapplication"
@@ -45,6 +56,10 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("com.google.android.material:material:1.12.0")
+    implementation("androidx.credentials:credentials:1.6.0-beta03")
+    implementation("androidx.credentials:credentials-play-services-auth:1.6.0-beta03")
+    implementation("com.google.android.libraries.identity.googleid:googleid:<latest version>")
+    implementation ("com.google.android.gms:play-services-auth:21.3.0")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

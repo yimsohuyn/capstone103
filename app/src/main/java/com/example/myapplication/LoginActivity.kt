@@ -2,6 +2,8 @@ package com.example.myapplication
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.KeyEvent
+import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
@@ -34,6 +36,14 @@ class LoginActivity : AppCompatActivity() {
                 Toast.makeText(this, "이메일 또는 비밀번호가 올바르지 않습니다", Toast.LENGTH_SHORT).show()
             }
         }
+        btnLogin.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                true
+            } else {
+                false
+            }
+        }
+
 
         // 회원가입 버튼 클릭 시 이동
         btnSignup.setOnClickListener {
