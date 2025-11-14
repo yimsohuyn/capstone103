@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/topMenu"
         android:layout_width="0dp"
         android:layout_height="80dp"
         android:background="#EBDCEB"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toTopOf="parent">
 
         <TextView
             android:id="@+id/titleText"
@@ -27,7 +27,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.703" />
+            app:layout_constraintVertical_bias="0.7" />
 
         <ImageView
             android:id="@+id/settingIcon"
@@ -38,7 +38,8 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.703" />
+            app:layout_constraintVertical_bias="0.7" />
+
         <ImageView
             android:id="@+id/bellIcon"
             android:layout_width="24dp"
@@ -48,7 +49,8 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.703" />
+            app:layout_constraintVertical_bias="0.7" />
+
         <ImageView
             android:id="@+id/searchIcon"
             android:layout_width="24dp"
@@ -58,37 +60,27 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.703" />
+            app:layout_constraintVertical_bias="0.7" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <CalendarView
         android:id="@+id/calendarView"
         android:layout_width="0dp"
         android:layout_height="300dp"
-        app:layout_constraintTop_toBottomOf="@id/topMenu"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
-<!--일정 시작-->
-    <FrameLayout
-        android:id="@+id/scheduleList"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        app:layout_constraintTop_toBottomOf="@id/calendarView"
-        app:layout_constraintBottom_toTopOf="@+id/bottomNav"
-        android:background="#FFFFFF"/>
+        app:layout_constraintTop_toBottomOf="@id/topMenu" />
 
-    <!-- 오늘 일정 목록 -->
     <LinearLayout
         android:id="@+id/todayScheduleArea"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="16dp"
-        app:layout_constraintTop_toBottomOf="@id/calendarView"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintBottom_toTopOf="@+id/bottomNav"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/calendarView">
 
-        <!-- 제목 -->
         <TextView
             android:id="@+id/todayTitle"
             android:layout_width="wrap_content"
@@ -99,137 +91,51 @@
             android:textSize="18sp"
             android:textStyle="bold" />
 
-        <!-- 일정 1 -->
-        <LinearLayout
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/syncCalendarButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="구글 캘린더 연동"
+            style="@style/Widget.Material3.Button"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/calendarStatusText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingVertical="4dp">
-
-            <TextView
-                android:id="@+id/time1"
-                android:layout_width="60dp"
-                android:layout_height="wrap_content"
-                android:text="12:30"
-                android:textColor="#000000"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/task1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="캡스톤 팀플"
-                android:textColor="#000000"
-                android:textSize="16sp" />
-        </LinearLayout>
-        <!-- 일정 2 -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingVertical="4dp">
-
-            <TextView
-                android:id="@+id/time2"
-                android:layout_width="60dp"
-                android:layout_height="wrap_content"
-                android:text="15:00"
-                android:textColor="#000000"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/task2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="전공 과제 제출"
-                android:textColor="#000000"
-                android:textSize="16sp" />
-        </LinearLayout>
+            android:text="구글 계정과 연결하면 일정이 자동으로 업데이트됩니다."
+            android:textColor="#FF5722"
+            android:paddingBottom="12dp" />
 
         <LinearLayout
+            android:id="@+id/calendarEventsContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingVertical="4dp">
+            android:orientation="vertical">
 
             <TextView
-                android:id="@+id/time2"
-                android:layout_width="60dp"
-                android:layout_height="wrap_content"
-                android:text="17:20"
-                android:textColor="#000000"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/task2"
+                android:id="@+id/emptyEventsText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="교양 팀플 "
-                android:textColor="#000000"
-                android:textSize="16sp" />
+                android:text="연동된 일정이 없습니다."
+                android:textColor="#757575" />
         </LinearLayout>
     </LinearLayout>
-    <!--일정 끝-->
-<!--    하단탭-->
-        <com.google.android.material.bottomnavigation.BottomNavigationView
-            android:id="@+id/bottomNav"
-            android:layout_width="0dp"
-            android:layout_height="56dp"
-            android:background="@android:color/white"
-            android:elevation="8dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
 
-            app:menu="@menu/menu_bottom_nav"
-            app:labelVisibilityMode="labeled"
-            app:itemIconSize="0dp"
-            app:itemTextColor="@color/nav_text_selector"
-            app:itemTextAppearanceActive="@style/BottomNavTextActive"
-            app:itemTextAppearanceInactive="@style/BottomNavTextInactive"/>
-<!--            app:itemActiveIndicatorStyle="@style/BottomNavActiveIndicator.None"/>-->
-<!--하단탭 끝-->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNav"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:background="@android:color/white"
+        android:elevation="8dp"
+        app:itemIconSize="0dp"
+        app:itemTextAppearanceActive="@style/BottomNavTextActive"
+        app:itemTextAppearanceInactive="@style/BottomNavTextInactive"
+        app:itemTextColor="@color/nav_text_selector"
+        app:labelVisibilityMode="labeled"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:menu="@menu/menu_bottom_nav" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
-
-<!--    <Button-->
-<!--        android:id="@+id/button"-->
-<!--        android:layout_width="51dp"-->
-<!--        android:layout_height="51dp"-->
-<!--        android:text="+"-->
-<!--        app:layout_constraintBottom_toTopOf="@id/tabArea"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        android:layout_margin="16dp"/>-->
-
-
-
-
-    <!--<?xml version="1.0" encoding="utf-8"?>-->
-    <!--<androidx.constraintlayout.widget.ConstraintLayout-->
-    <!--    xmlns:android="http://schemas.android.com/apk/res/android"-->
-    <!--    xmlns:app="http://schemas.android.com/apk/res-auto"-->
-    <!--    xmlns:tools="http://schemas.android.com/tools"-->
-    <!--    android:layout_width="match_parent"-->
-    <!--    android:layout_height="match_parent">-->
-
-    <!--    <TextView-->
-    <!--        android:layout_width="wrap_content"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:layout_marginStart="88dp"-->
-    <!--        android:layout_marginTop="256dp"-->
-    <!--        android:text="Hello Android"-->
-    <!--        android:textSize="24sp"-->
-    <!--        app:layout_constraintStart_toStartOf="parent"-->
-    <!--        app:layout_constraintTop_toTopOf="parent" />-->
-
-    <!--    <Button-->
-    <!--        android:id="@+id/button"-->
-    <!--        android:layout_width="51dp"-->
-    <!--        android:layout_height="51dp"-->
-    <!--        android:text="+"-->
-    <!--        tools:layout_editor_absoluteX="257dp"-->
-    <!--        tools:layout_editor_absoluteY="436dp" />-->
-
-    <!--</androidx.constraintlayout.widget.ConstraintLayout>-->
