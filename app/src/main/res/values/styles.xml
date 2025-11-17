@@ -19,7 +19,13 @@
         <item name="android:textSize">14sp</item>
     </style>
 
-<!--    &lt;!&ndash; ✅ 선택 시 배경 하이라이트(둥근 색 배경) 제거 &ndash;&gt;-->
+    <style name="FAB_Round">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+
+    <!--    &lt;!&ndash; ✅ 선택 시 배경 하이라이트(둥근 색 배경) 제거 &ndash;&gt;-->
 <!--    <style name="BottomNavActiveIndicator.None">-->
 <!--        <item name="android:color">@android:color/transparent</item>-->
 <!--    </style>-->

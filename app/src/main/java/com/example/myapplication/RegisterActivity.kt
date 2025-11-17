@@ -116,4 +116,3 @@ class RegisterActivity : AppCompatActivity() {
 //        finish()  // 현재 로그인 화면 종료
 //    }
 //}
-

@@ -73,13 +73,14 @@
 
     <LinearLayout
         android:id="@+id/todayScheduleArea"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:orientation="vertical"
         android:padding="16dp"
-        app:layout_constraintBottom_toTopOf="@+id/bottomNav"
+        app:layout_constraintTop_toBottomOf="@id/calendarView"
+        app:layout_constraintBottom_toTopOf="@id/bottomNav"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/calendarView">
+        app:layout_constraintEnd_toEndOf="parent">
 
         <TextView
             android:id="@+id/todayTitle"
@@ -93,11 +94,11 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/syncCalendarButton"
+            style="@style/Widget.Material3.Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="구글 캘린더 연동"
-            style="@style/Widget.Material3.Button"
-            android:layout_marginBottom="8dp" />
+            android:layout_marginBottom="8dp"
+            android:text="구글 캘린더 연동" />
 
         <TextView
             android:id="@+id/calendarStatusText"
@@ -122,6 +123,21 @@
         </LinearLayout>
     </LinearLayout>
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabAdd"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_add"
+        android:contentDescription="Add Schedule"
+        app:tint="@android:color/white"
+        app:layout_constraintBottom_toTopOf="@id/bottomNav"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="16dp"
+        app:backgroundTint="#9370DB"
+        app:maxImageSize="24dp"
+        app:shapeAppearanceOverlay="@style/FAB_Round"/>
+
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNav"
         android:layout_width="0dp"
@@ -139,3 +155,7 @@
         app:menu="@menu/menu_bottom_nav" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+
