@@ -278,6 +278,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun openSettings() {
-        startActivity(Intent(this, SettingActivity::class.java))
+        val intent = Intent(this, SettingActivity::class.java)
+        startActivity(intent)
     }
 }

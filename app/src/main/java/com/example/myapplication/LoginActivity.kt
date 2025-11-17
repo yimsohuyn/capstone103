@@ -8,6 +8,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.gms.auth.api.signin.GoogleSignIn
 
 class LoginActivity : AppCompatActivity() {
 
@@ -15,12 +16,19 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-
         val etEmail = findViewById<EditText>(R.id.etEmail)
         val etPassword = findViewById<EditText>(R.id.etPassword)
         val btnLogin = findViewById<Button>(R.id.btnLogin)
         val btnSignup = findViewById<Button>(R.id.btnSignup) // 회원가입 버튼 연결
 
+        val account = GoogleSignIn.getLastSignedInAccount(this)
+        if (account != null) {
+            // 이미 로그인됨 → 바로 메인으로 이동
+            val intent = Intent(this, MainActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+            return
+        }
 
         btnLogin.setOnClickListener {
             val email = etEmail.text.toString()
