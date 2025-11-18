@@ -34,7 +34,6 @@ import java.text.SimpleDateFormat
 import java.util.Calendar as JavaCalendar
 import java.util.Locale
 import com.google.api.services.calendar.model.EventDateTime
-import androidx.activity.result.contract.ActivityResultContracts
 
 data class Schedule(val title: String, val time: String? = "시간 미지정")
 
@@ -280,7 +279,7 @@ class MainActivity : AppCompatActivity() {
 
         val titleView = TextView(this).apply {
             layoutParams = LinearLayout.LayoutParams(
-                0,
+                0,  
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 0.7f
             )
