@@ -5,7 +5,10 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.Typeface
 import android.os.Bundle
+import android.util.Log
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -18,6 +21,7 @@ import com.google.api.client.json.gson.GsonFactory
 import com.google.api.client.util.DateTime
 import com.google.api.services.calendar.Calendar
 import com.google.api.services.calendar.CalendarScopes
+import com.google.api.services.calendar.model.Event
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -25,6 +29,8 @@ import java.text.SimpleDateFormat
 import java.util.Calendar as JavaCalendar
 import java.util.Date
 import java.util.Locale
+import kotlin.collections.forEach
+import kotlin.collections.orEmpty
 
 class EventDetailActivity : AppCompatActivity() {
 
@@ -33,6 +39,9 @@ class EventDetailActivity : AppCompatActivity() {
     private var htmlLink: String? = null
     var startMillis: Long = -1L
     var endMillis: Long = -1L
+    private lateinit var calendarStatusText: TextView
+    private lateinit var calendarEventsContainer: LinearLayout
+    private var selectedDateMillis: Long = System.currentTimeMillis()
 
     // ─── 구글 캘린더 서비스 (삭제용) ───
     private var calendarService: Calendar? = null
@@ -46,6 +55,16 @@ class EventDetailActivity : AppCompatActivity() {
 
     private val dateFormatter = SimpleDateFormat("M월 d일 (E)", Locale.KOREAN)
     private val timeFormatter = SimpleDateFormat("a h:mm", Locale.KOREAN)
+    override fun finish() {
+        setResult(RESULT_OK)
+        super.finish()
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        setResult(RESULT_OK)
+        finish()
+        return true
+    }
 
     // ✅ 편집 화면에서 돌아올 때 결과 받는 런처
     private val editEventLauncher =
@@ -112,7 +131,11 @@ class EventDetailActivity : AppCompatActivity() {
         }
 
         // 뒤로가기
-        findViewById<ImageButton>(R.id.btnBack).setOnClickListener { finish() }
+        findViewById<ImageButton>(R.id.btnBack).setOnClickListener {
+            setResult(RESULT_OK)
+            finish()
+        }
+
 
         // 캘린더 서비스 (삭제용)
         calendarService = buildCalendarService()
@@ -224,6 +247,13 @@ class EventDetailActivity : AppCompatActivity() {
                     Toast.LENGTH_LONG
                 ).show()
             }
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        if (isFinishing) {
+            setResult(RESULT_OK)
         }
     }
 }

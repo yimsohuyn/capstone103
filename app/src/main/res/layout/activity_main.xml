@@ -92,13 +92,13 @@
             android:textSize="18sp"
             android:textStyle="bold" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/syncCalendarButton"
-            style="@style/Widget.Material3.Button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:text="구글 캘린더 연동" />
+<!--        <com.google.android.material.button.MaterialButton-->
+<!--            android:id="@+id/syncCalendarButton"-->
+<!--            style="@style/Widget.Material3.Button"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginBottom="8dp"-->
+<!--            android:text="구글 캘린더 연동" />-->
 
         <TextView
             android:id="@+id/calendarStatusText"

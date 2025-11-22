@@ -34,12 +34,13 @@ import java.text.SimpleDateFormat
 import java.util.Calendar as JavaCalendar
 import java.util.Locale
 import com.google.api.services.calendar.model.EventDateTime
+import kotlin.collections.orEmpty
 
 data class Schedule(val title: String, val time: String? = "시간 미지정")
 
 class MainActivity : AppCompatActivity() {
     private lateinit var googleSignInClient: GoogleSignInClient
-    private lateinit var syncCalendarButton: MaterialButton
+    //private lateinit var syncCalendarButton: MaterialButton
     private lateinit var calendarStatusText: TextView
     private lateinit var calendarEventsContainer: LinearLayout
     private lateinit var calendarView: CalendarView
@@ -51,6 +52,12 @@ class MainActivity : AppCompatActivity() {
     // 앱 내부에서 추가한 일정들(구글과 상관없는 로컬 일정)
     private val schedulesByDate = mutableMapOf<Long, MutableList<Schedule>>()
 
+    private val detailLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                fetchEventsForSelectedDay()
+            }
+        }
 
     // ✅ Google 로그인 결과 처리
     private val signInLauncher =
@@ -79,6 +86,8 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+
+
     private fun navigateToMainPage() {
         val intent = Intent(this, MainActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -102,7 +111,7 @@ class MainActivity : AppCompatActivity() {
 
         // 뷰 초기화
         calendarView = findViewById(R.id.calendarView)
-        syncCalendarButton = findViewById(R.id.syncCalendarButton)
+        //syncCalendarButton = findViewById(R.id.syncCalendarButton)
         calendarStatusText = findViewById(R.id.calendarStatusText)
         calendarEventsContainer = findViewById(R.id.calendarEventsContainer)
 
@@ -125,7 +134,6 @@ class MainActivity : AppCompatActivity() {
         findViewById<FloatingActionButton>(R.id.fabAdd).setOnClickListener {
             showScheduleBottomSheet()
         }
-
     }
 
     // ✅ Google 로그인 옵션 설정 (Calendar 전체 권한)
@@ -159,17 +167,17 @@ class MainActivity : AppCompatActivity() {
             fetchEventsForSelectedDay()                 // 구글 일정
         }
 
-        syncCalendarButton.setOnClickListener {
-            googleSignInClient.signOut().addOnCompleteListener {
-                signInLauncher.launch(googleSignInClient.signInIntent)
-                showStatus("로그인 화면을 표시합니다.")
-            }
-        }
+//        syncCalendarButton.setOnClickListener {
+//            googleSignInClient.signOut().addOnCompleteListener {
+//                signInLauncher.launch(googleSignInClient.signInIntent)
+//                showStatus("로그인 화면을 표시합니다.")
+//            }
+//        }
     }
 
     private fun onAccountSignedIn(account: GoogleSignInAccount) {
         calendarService = buildCalendarService(account)
-        syncCalendarButton.text = "일정 새로고침"
+    //    syncCalendarButton.text = "일정 새로고침"
         showStatus("연결됨: ${account.email ?: account.displayName ?: "Google 계정"}")
         fetchEventsForSelectedDay()
     }
@@ -302,7 +310,7 @@ class MainActivity : AppCompatActivity() {
                 putExtra("startMillis", start)
                 putExtra("endMillis", end)
             }
-            startActivity(intent)
+            detailLauncher.launch(intent)
         }
 
         return container
