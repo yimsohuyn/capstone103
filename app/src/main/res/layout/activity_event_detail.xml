@@ -70,12 +70,14 @@
             android:orientation="vertical"
             android:padding="16dp">
 
+            <!-- 날짜 + 시간 묶음 영역 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="12dp">
 
+                <!-- 날짜 줄 -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -111,6 +113,7 @@
                         android:textSize="16sp" />
                 </LinearLayout>
 
+                <!-- 시간 줄 -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -144,6 +147,21 @@
                 </LinearLayout>
             </LinearLayout>
 
+            <!-- ★ 상세 내용: 시간 줄 바로 아래, 시간과 같은 기준선에 맞춤 -->
+            <TextView
+                android:id="@+id/tvDetail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:paddingStart="42dp"
+                android:paddingEnd="16dp"
+                android:text="상세 내용이 여기에 표시됩니다"
+                android:textSize="15sp"
+                android:lineSpacingExtra="2dp"
+                android:maxLines="5"
+                android:ellipsize="end" />
+
+            <!-- 구분선 -->
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
@@ -151,6 +169,7 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"/>
 
+            <!-- 내 캘린더 영역 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

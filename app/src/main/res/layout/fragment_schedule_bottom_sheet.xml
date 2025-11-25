@@ -18,7 +18,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- 제목 (한 번만 선언!!) -->
+    <!-- 제목 -->
     <TextView
         android:id="@+id/tvBottomSheetTitle"
         android:layout_width="0dp"
@@ -27,7 +27,7 @@
         android:textSize="20sp"
         android:textStyle="bold"
         android:gravity="center"
-        app:layout_constraintStart_toEndOf="@id/btnBack"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/btnBack"
         app:layout_constraintBottom_toBottomOf="@id/btnBack" />
@@ -69,17 +69,58 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- 시간 -->
-    <EditText
-        android:id="@+id/editScheduleTime"
+    <!-- 시간 라벨 -->
+    <TextView
+        android:id="@+id/tvTimeLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="시간"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_marginTop="12dp"
+        app:layout_constraintTop_toBottomOf="@id/datePicker"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <!-- 시작/종료 시간 입력 줄 -->
+    <LinearLayout
+        android:id="@+id/layoutTime"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:hint="시간 (예: 12:30)"
-        android:inputType="time"
-        android:layout_marginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@id/datePicker"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginTop="4dp"
+        app:layout_constraintTop_toBottomOf="@id/tvTimeLabel"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- 시작 시간 -->
+        <EditText
+            android:id="@+id/editStartTime"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="시작 (예: 0930)"
+            android:inputType="number"
+            android:maxLength="5"
+            android:textSize="15sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="8dp"
+            android:text="~" />
+
+        <!-- 종료 시간 -->
+        <EditText
+            android:id="@+id/editEndTime"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="종료 (예: 1030)"
+            android:inputType="number"
+            android:maxLength="5"
+            android:textSize="15sp" />
+    </LinearLayout>
 
     <!-- 상세 내용 -->
     <EditText
@@ -91,7 +132,7 @@
         android:minLines="3"
         android:gravity="top|start"
         android:layout_marginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@id/editScheduleTime"
+        app:layout_constraintTop_toBottomOf="@id/layoutTime"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

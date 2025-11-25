@@ -5,10 +5,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
-import android.graphics.Typeface
 import android.os.Bundle
-import android.util.Log
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -18,19 +15,22 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
 import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.json.gson.GsonFactory
-import com.google.api.client.util.DateTime
 import com.google.api.services.calendar.Calendar
 import com.google.api.services.calendar.CalendarScopes
-import com.google.api.services.calendar.model.Event
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
-import java.util.Calendar as JavaCalendar
 import java.util.Date
 import java.util.Locale
+import java.util.Calendar as JavaCalendar
+import android.graphics.Color
+import android.graphics.Typeface
+import android.util.Log
+import com.google.api.services.calendar.model.Event
 import kotlin.collections.forEach
 import kotlin.collections.orEmpty
+
 
 class EventDetailActivity : AppCompatActivity() {
 
@@ -39,6 +39,12 @@ class EventDetailActivity : AppCompatActivity() {
     private var htmlLink: String? = null
     var startMillis: Long = -1L
     var endMillis: Long = -1L
+
+
+    // ★ 상세 내용용 변수 추가
+    private var detail: String = ""
+
+    // (아래 둘은 네 코드에서 지금 안 쓰고 있는 듯 해서 그대로 두거나 지워도 됨)
     private lateinit var calendarStatusText: TextView
     private lateinit var calendarEventsContainer: LinearLayout
     private var selectedDateMillis: Long = System.currentTimeMillis()
@@ -53,8 +59,12 @@ class EventDetailActivity : AppCompatActivity() {
     private lateinit var tvStartTime: TextView
     private lateinit var tvEndTime: TextView
 
+    // ★ 상세 내용 TextView 참조 추가
+    private lateinit var tvDetail: TextView
+
     private val dateFormatter = SimpleDateFormat("M월 d일 (E)", Locale.KOREAN)
     private val timeFormatter = SimpleDateFormat("a h:mm", Locale.KOREAN)
+
     override fun finish() {
         setResult(RESULT_OK)
         super.finish()
@@ -76,10 +86,16 @@ class EventDetailActivity : AppCompatActivity() {
             val newStart = data.getLongExtra("startMillis", startMillis)
             val newEnd = data.getLongExtra("endMillis", endMillis)
 
+            // ★ 편집 화면에서 detail 도 넘긴다면 같이 받기
+            val newDetail = data.getStringExtra("detail") ?: detail
+
             // 내부 값 갱신
             startMillis = newStart
             endMillis = newEnd
+            detail = newDetail
+
             tvTitle.text = newTitle
+            tvDetail.text = detail
 
             if (startMillis > 0 && endMillis > 0) {
                 val start = Date(startMillis)
@@ -107,14 +123,19 @@ class EventDetailActivity : AppCompatActivity() {
         startMillis = intent.getLongExtra("startMillis", -1L)
         endMillis = intent.getLongExtra("endMillis", -1L)
 
+        // ★ 인텐트에서 상세 내용도 함께 받기 (없으면 빈 문자열)
+        detail = intent.getStringExtra("detail") ?: ""
+
         // ─── UI 바인딩 ───
         tvTitle = findViewById(R.id.tvTitle)
         tvStartDate = findViewById(R.id.tvStartDate)
         tvEndDate = findViewById(R.id.tvEndDate)
         tvStartTime = findViewById(R.id.tvStartTime)
         tvEndTime = findViewById(R.id.tvEndTime)
+        tvDetail = findViewById(R.id.tvDetail)   // ★ 상세내용 TextView
 
         tvTitle.text = titleFromIntent
+        tvDetail.text = detail                    // ★ 화면에 상세내용 세팅
 
         if (startMillis > 0 && endMillis > 0) {
             val start = Date(startMillis)
@@ -136,13 +157,18 @@ class EventDetailActivity : AppCompatActivity() {
             finish()
         }
 
-
         // 캘린더 서비스 (삭제용)
         calendarService = buildCalendarService()
 
         // ─── 하단 버튼 동작 ───
         findViewById<LinearLayout>(R.id.btnCopy).setOnClickListener {
-            copyToClipboard(tvTitle.text.toString())
+            // ★ 복사할 때 제목 + 상세내용 같이 복사하고 싶으면 이렇게
+            val copyText = if (detail.isNotBlank()) {
+                "${tvTitle.text}\n$detail"
+            } else {
+                tvTitle.text.toString()
+            }
+            copyToClipboard(copyText)
         }
 
         // ✅ 편집 버튼: EditEventActivity 로 이동 (결과 받기)
@@ -152,6 +178,7 @@ class EventDetailActivity : AppCompatActivity() {
                 putExtra("title", tvTitle.text.toString())
                 putExtra("startMillis", startMillis)
                 putExtra("endMillis", endMillis)
+                putExtra("detail", detail)  // ★ 편집 화면에도 상세내용 전달
             }
             editEventLauncher.launch(intent)
         }
@@ -188,7 +215,7 @@ class EventDetailActivity : AppCompatActivity() {
     private fun copyToClipboard(text: String) {
         val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         clipboard.setPrimaryClip(ClipData.newPlainText("event", text))
-        Toast.makeText(this, "제목이 복사되었습니다.", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "복사되었습니다.", Toast.LENGTH_SHORT).show()
     }
 
     private fun shareEvent() {
@@ -202,6 +229,12 @@ class EventDetailActivity : AppCompatActivity() {
                 "${dateFormatter.format(start)} ${timeFormatter.format(start)} - " +
                         "${dateFormatter.format(end)} ${timeFormatter.format(end)}"
             )
+        }
+
+        // ★ 공유 텍스트에 상세 내용도 포함
+        if (detail.isNotBlank()) {
+            builder.appendLine()
+            builder.appendLine(detail)
         }
 
         val intent = Intent(Intent.ACTION_SEND).apply {

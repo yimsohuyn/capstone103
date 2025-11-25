@@ -19,7 +19,10 @@ android {
 //            SHA256: 03:15:85:4C:12:71:44:6E:BC:6E:9D:ED:51:EC:EF:03:CD:1B:A5:D0:5A:6F:8F:11:A3:46:25:D1:76:58:7A:28
         }
     }
-
+    buildFeatures {
+        compose = true
+        viewBinding = true
+    }
     defaultConfig {
         applicationId = "com.example.myapplication"
         minSdk = 24
@@ -73,7 +76,7 @@ dependencies {
     implementation("com.google.api-client:google-api-client-android:1.34.0")
     implementation("com.google.apis:google-api-services-calendar:v3-rev20240517-2.0.0")
     implementation("com.google.http-client:google-http-client-gson:1.43.3")
-    implementation("com.google.oauth-client:google-oauth-client-jetty:1.34.1")  // ⭐ 추가된 라인
+    implementation("com.google.oauth-client:google-oauth-client-jetty:1.34.1")
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
     implementation(libs.androidx.core.ktx)
@@ -84,6 +87,9 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    implementation("androidx.navigation:navigation-fragment-ktx:2.8.3")
+    implementation("androidx.navigation:navigation-ui-ktx:2.8.3")
+
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
