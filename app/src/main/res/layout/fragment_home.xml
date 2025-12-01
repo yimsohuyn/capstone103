@@ -42,21 +42,32 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.7" />
 
-        <ImageView
-            android:id="@+id/bellIcon"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginEnd="34dp"
-            android:src="@drawable/ic_bell"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.7" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <!-- D-Day 팝업 열기용 아이콘 -->
+            <ImageView
+                android:id="@+id/bellIcon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="34dp"
+                android:src="@drawable/ic_bell"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.7"
+
+            android:contentDescription="@string/app_name" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <ImageView
             android:id="@+id/searchIcon"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="23dp"
+            android:layout_height="23dp"
             android:layout_marginEnd="64dp"
             android:src="@drawable/ic_search"
             app:layout_constraintBottom_toBottomOf="parent"

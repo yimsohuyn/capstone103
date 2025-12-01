@@ -54,6 +54,25 @@ class HomeFragment : Fragment() {
     // 구글 로그인 / 캘린더
     private lateinit var googleSignInClient: GoogleSignInClient
     private var calendarService: Calendar? = null
+    private var ddayDialog: DdayDialogFragment? = null
+
+    // setting
+    private val settingLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val account = GoogleSignIn.getLastSignedInAccount(requireContext())
+
+                if (account != null) {
+                    onAccountSignedIn(account)
+                } else {
+                    calendarService = null
+                    showStatus("구글 계정을 연결해주세요.")
+                    _binding?.calendarEventsContainer?.removeAllViews()
+                }
+                fetchEventsForSelectedDay()
+                ddayDialog?.refreshFromParent()
+            }
+        }
 
     // 날짜 + 시간 포맷
     private var selectedDateMillis: Long = System.currentTimeMillis()
@@ -65,7 +84,8 @@ class HomeFragment : Fragment() {
     private val detailLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
-                fetchEventsForSelectedDay()
+                fetchEventsForSelectedDay()      // 홈 화면 갱신 (네가 만든 함수)
+                ddayDialog?.refreshFromParent()  // 팝업 안 리스트 갱신
             }
         }
 
@@ -130,24 +150,47 @@ class HomeFragment : Fragment() {
 
         googleSignInClient = GoogleSignIn.getClient(requireContext(), gso)
     }
+    //=====================bell 관련=================
+    private fun openDdayPopup() {
+        val dialog = DdayDialogFragment().apply {
+            this.calendarService = this@HomeFragment.calendarService
 
+            this.onEventClick = { item ->
+                val intent = Intent(requireContext(), EventDetailActivity::class.java).apply {
+                    putExtra("title", item.title)
+                    putExtra("eventId", item.eventId)
+                    putExtra("htmlLink", item.htmlLink)
+                    putExtra("startMillis", item.startMillis)
+                    putExtra("endMillis", item.endMillis)
+                }
+                detailLauncher.launch(intent)   // 이미 HomeFragment 에 있는 런처
+            }
+        }
+        ddayDialog = dialog
+        dialog.show(parentFragmentManager, "ddayDialog")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        fetchEventsForSelectedDay()
+        ddayDialog?.refreshFromParent()
+    }
+    //=============================================
     private fun initTopMenu() {
         binding.searchIcon.setOnClickListener {
             startActivity(Intent(requireContext(), SearchActivity::class.java))
         }
 
         binding.bellIcon.setOnClickListener {
-            AlertDialog.Builder(requireContext())
-                .setTitle("알림")
-                .setMessage("알림 화면 준비중입니다.")
-                .setPositiveButton("확인", null)
-                .show()
+            openDdayPopup()
         }
 
         binding.settingIcon.setOnClickListener {
-            startActivity(Intent(requireContext(), SettingActivity::class.java))
+            val intent = Intent(requireContext(), SettingActivity::class.java)
+            settingLauncher.launch(intent)
         }
     }
+
 
     private fun initCalendarUi() {
         // 처음 선택 날짜

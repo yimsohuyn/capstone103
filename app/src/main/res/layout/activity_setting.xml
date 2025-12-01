@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context=".SettingsActivity">
 
     <!-- 상단바 -->
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -21,7 +21,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
-            android:text="    setting 화면"
+            android:text="setting 화면"
             android:textColor="#000000"
             android:textSize="24sp"
             android:textStyle="bold"
@@ -30,42 +30,56 @@
             app:layout_constraintVertical_bias="0.7" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-
-
-    <!-- 로그아웃 버튼 -->
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/setting_logout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="로그아웃"
-        style="@style/Widget.Material3.Button"
-        app:layout_constraintTop_toBottomOf="@id/settingtop"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"/>
-
-    <!-- 메뉴 영역 -->
+    <!-- 메뉴 영역 전체 -->
     <LinearLayout
         android:id="@+id/settingmenu"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:orientation="vertical"
         android:background="#EFEFEF"
-        app:layout_constraintTop_toBottomOf="@id/setting_logout"
+        app:layout_constraintTop_toBottomOf="@id/settingtop"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintBottom_toBottomOf="parent">
 
-<!--    <TextView-->
-<!--        android:id="@+id/settingds"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_marginStart="20dp"-->
-<!--        android:text="    디자인 추후 변경 예정"-->
-<!--        android:textColor="#000000"-->
-<!--        android:textSize="24sp"-->
-<!--        app:layout_constraintBottom_toBottomOf="parent"-->
-<!--        app:layout_constraintTop_toTopOf="parent" />-->
+        <!-- 계정 메뉴 한 줄 -->
+        <LinearLayout
+            android:id="@+id/layout_menu_account"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:background="#FFFFFF"
+            android:clickable="true"
+            android:focusable="true">
+
+            <TextView
+                android:id="@+id/text_menu_account"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="계정"
+                android:textColor="#000000"
+                android:textSize="16sp" />
+
+            <!-- 오른쪽 화살표 아이콘 대신 텍스트로 대체 (원하면 ImageView 사용 가능) -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text=""
+                />
+
+            <TextView
+                android:id="@+id/text_menu_account_arrow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=">"
+                android:textSize="16sp"
+                android:textColor="#888888" />
+        </LinearLayout>
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-

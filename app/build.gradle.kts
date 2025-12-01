@@ -72,7 +72,7 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:32.3.1"))
     implementation("com.google.firebase:firebase-auth-ktx")
 
-    // ✅ Google Calendar API (extensions 문제 해결 핵심)
+    // Google Calendar API (extensions 문제 해결 핵심)
     implementation("com.google.api-client:google-api-client-android:1.34.0")
     implementation("com.google.apis:google-api-services-calendar:v3-rev20240517-2.0.0")
     implementation("com.google.http-client:google-http-client-gson:1.43.3")
