@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -60,6 +61,14 @@ class SearchActivity : AppCompatActivity() {
 
         initCalendarService()
         initUi()
+
+        findViewById<ImageButton>(R.id.btnBack).setOnClickListener {
+            val intent = Intent(this, MainActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            intent.putExtra("go_to_home", true) // 홈 화면 이동 신호
+            startActivity(intent)
+            finish()
+        }
     }
 
     private fun initCalendarService() {

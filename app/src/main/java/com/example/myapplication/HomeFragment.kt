@@ -397,7 +397,10 @@ class HomeFragment : Fragment() {
                 month: Int,
                 day: Int,
                 time: String?,
-                detail: String?
+                detail: String?,
+                isAlarmOn: Boolean,
+                alarmTime: String?
+
             ) {
                 val cal = JavaCalendar.getInstance().apply {
                     set(year, month, day, 0, 0, 0)
