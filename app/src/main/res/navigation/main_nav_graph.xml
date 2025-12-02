@@ -25,11 +25,6 @@
         android:label="학습 분석" />
 
     <fragment
-        android:id="@+id/settingFragment"
-        android:name="com.example.myapplication.SettingFragment"
-        android:label="설정" />
-
-    <fragment
         android:id="@+id/teamProjectFragment"
         android:name="com.example.myapplication.TeamProjectFragment"
         android:label="Team Project" />

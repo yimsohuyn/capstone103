@@ -1,15 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:padding="20dp"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#FFF7FF"
+    android:padding="16dp">
 
+    <!-- 상단 제목 -->
     <TextView
-        android:text="학습 분석 화면"
-        android:textSize="24sp"
-        android:textStyle="bold"
+        android:id="@+id/tvTitle"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:text="학습 분석 화면"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="12dp" />
+
+    <!-- 🔽
+ 여기부터 퀴즈 탭 영역 🔽
+ -->
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayoutQuiz"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:tabMode="fixed"
+        app:tabGravity="fill">
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="퀴즈 생성" />
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="학습된 퀴즈" />
+    </com.google.android.material.tabs.TabLayout>
+
+    <!-- 탭의 내용이 바뀌는 영역 -->
+    <FrameLayout
+        android:id="@+id/quizContentContainer"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="8dp" />
+
 </LinearLayout>

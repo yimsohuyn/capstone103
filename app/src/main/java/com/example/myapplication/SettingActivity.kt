@@ -135,4 +135,3 @@ class SettingActivity : AppCompatActivity() {
         }
     }
 }
-

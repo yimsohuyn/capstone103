@@ -3,6 +3,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
     alias(libs.plugins.kotlin.compose)
     id("com.google.gms.google-services")
+    id("org.jetbrains.kotlin.kapt")
 }
 
 android {
@@ -62,6 +63,7 @@ android {
 }
 
 dependencies {
+
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("com.google.android.material:material:1.12.0")
@@ -69,10 +71,14 @@ dependencies {
     implementation("androidx.credentials:credentials-play-services-auth:1.6.0-beta03")
     implementation("com.google.android.gms:play-services-auth:21.3.0")
     implementation("com.google.android.libraries.identity.googleid:googleid:1.1.0")
-    implementation(platform("com.google.firebase:firebase-bom:32.3.1"))
     implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.firebase:firebase-firestore-ktx")
+    implementation(platform("com.google.firebase:firebase-bom:33.5.1"))
+    implementation("com.google.firebase:firebase-dynamic-links-ktx")
+    implementation("com.kizitonwose.calendar:view:2.0.0")
 
-    // Google Calendar API (extensions 문제 해결 핵심)
+
+    // ✅ Google Calendar API (extensions 문제 해결 핵심)
     implementation("com.google.api-client:google-api-client-android:1.34.0")
     implementation("com.google.apis:google-api-services-calendar:v3-rev20240517-2.0.0")
     implementation("com.google.http-client:google-http-client-gson:1.43.3")
@@ -89,6 +95,18 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation("androidx.navigation:navigation-fragment-ktx:2.8.3")
     implementation("androidx.navigation:navigation-ui-ktx:2.8.3")
+
+    // QR 코드 생성 라이브러리
+    implementation("com.google.zxing:core:3.5.1")
+
+    implementation("androidx.room:room-runtime:2.6.1")
+    implementation("androidx.room:room-ktx:2.6.1")
+    kapt("androidx.room:room-compiler:2.6.1")
+
+    val room_version = "2.7.0-alpha06"
+    implementation("androidx.room:room-runtime:$room_version")
+    implementation("androidx.room:room-ktx:$room_version")
+    kapt("androidx.room:room-compiler:$room_version")
 
 
     testImplementation(libs.junit)

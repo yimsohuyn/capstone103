@@ -42,4 +42,3 @@ class DdayEventAdapter(
 
     override fun getItemCount(): Int = items.size
 }
-

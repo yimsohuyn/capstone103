@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <!-- QR 코드 이미지 -->
+    <ImageView
+        android:id="@+id/qrImage"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_gravity="center_horizontal"
+        android:contentDescription="초대 QR 코드"
+        android:layout_marginBottom="16dp" />
+
+    <!-- 초대 링크 텍스트 -->
+    <TextView
+        android:id="@+id/inviteLink"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="초대 링크가 여기에 표시됩니다."
+        android:textSize="14sp"
+        android:textColor="#333333"
+        android:padding="8dp"
+        android:background="#EEEEEE"
+        android:layout_marginBottom="12dp" />
+
+
+    <!-- 링크 복사 버튼 -->
+    <Button
+        android:id="@+id/copyLinkBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_marginTop="12dp"
+        android:padding="8dp"
+        android:text="링크 복사" />
+
+</LinearLayout>

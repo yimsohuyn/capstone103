@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.example.myapplication">
 
-    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
-    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+
 
     <application
         android:allowBackup="true"
@@ -19,11 +21,22 @@
         <activity android:name=".AppInfoActivity" />
         <activity android:name=".SearchActivity" />
         <activity android:name=".SettingActivity" />
+        <activity android:name=".RegisterActivity" />
         <activity android:name=".SettingAccount" />
 
+        <!-- ✅
+ 스플래시 화면: 앱 실행 시 가장 먼저 뜨는 액티비티 -->
+        <activity
+            android:name=".SplashActivity"
+            android:exported="true"
+            android:theme="@style/Theme.MyApplication">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
 
-        <activity android:name=".RegisterActivity" />
-        <!-- 앱 시작 화면: 로그인 -->
+        <!-- 로그인 화면 (스플래시 이후에 띄워짐) -->
         <activity
             android:name=".LoginActivity"
             android:exported="true"
@@ -34,11 +47,10 @@
             </intent-filter>
         </activity>
 
-
         <!-- 기존 메인 화면 -->
         <activity
             android:name=".MainActivity"
-            android:exported="false"/>
+            android:exported="false" />
 
         <activity
             android:name=".EventDetailActivity"
@@ -51,6 +63,5 @@
         <receiver android:name=".AlarmReceiver"/>
 
     </application>
-
 
 </manifest>

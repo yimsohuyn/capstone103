@@ -8,6 +8,11 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.example.myapplication.data.AppDatabase
+import com.example.myapplication.data.AssignmentEntity
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import androidx.lifecycle.lifecycleScope
 import java.util.*
 
 class AssignmentRegisterFragment : Fragment() {
@@ -32,16 +37,15 @@ class AssignmentRegisterFragment : Fragment() {
         // ---- 1) DatePicker ----
         dueDateLayout.setOnClickListener {
             val cal = Calendar.getInstance()
-            val datePicker = DatePickerDialog(
+            DatePickerDialog(
                 requireContext(),
                 { _, year, month, day ->
-                    textDueDate.text = "$year-${month + 1}-$day"
+                    textDueDate.text = "%04d-%02d-%02d".format(year, month + 1, day)
                 },
                 cal.get(Calendar.YEAR),
                 cal.get(Calendar.MONTH),
                 cal.get(Calendar.DAY_OF_MONTH)
-            )
-            datePicker.show()
+            ).show()
         }
 
         // ---- 2) Assignee 선택 ----
@@ -50,7 +54,7 @@ class AssignmentRegisterFragment : Fragment() {
         }
 
         // ---- 3) Assignment Type Spinner ----
-        val typeItems = listOf("개인 프로젝트", "팀 프로젝트", "발표")
+        val typeItems = listOf("개인 프로젝트", "팀 프로젝트")
         val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, typeItems)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerType.adapter = adapter
@@ -58,14 +62,37 @@ class AssignmentRegisterFragment : Fragment() {
         // ---- 4) SUBMIT 버튼 ----
         submitBtn.setOnClickListener {
 
-            val selectedType = spinnerType.selectedItem.toString()
+            val type = spinnerType.selectedItem.toString()
+            val dueDate = textDueDate.text.toString()
+            val assignee = textAssignee.text.toString()
 
-            if (selectedType == "팀 프로젝트") {
-                findNavController().navigate(R.id.teamProjectFragment)
-            } else {
-                Toast.makeText(requireContext(), "제출완료!", Toast.LENGTH_SHORT).show()
+            if (dueDate.isEmpty()) {
+                Toast.makeText(requireContext(), "마감일을 선택하세요!", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
             }
 
+            val dao = AppDatabase.getDatabase(requireContext()).assignmentDao()
+
+            // --- DB 저장 ---
+            lifecycleScope.launch(Dispatchers.IO) {
+                dao.insert(
+                    AssignmentEntity(
+                        type = type,
+                        dueDate = dueDate,
+                        assignee = assignee
+                    )
+                )
+
+                launch(Dispatchers.Main) {
+                    Toast.makeText(requireContext(), "과제가 저장되었습니다!", Toast.LENGTH_SHORT).show()
+
+                    if (type == "팀 프로젝트") {
+                        findNavController().navigate(R.id.teamProjectFragment)
+                    } else {
+                        findNavController().navigateUp()
+                    }
+                }
+            }
         }
 
         return view

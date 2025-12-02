@@ -1,11 +1,16 @@
 package com.example.myapplication
 
 import android.content.Intent
-import androidx.navigation.ui.setupWithNavController
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupWithNavController
 import com.example.myapplication.databinding.ActivityMainBinding
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.dynamiclinks.ktx.dynamicLinks
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 
 class MainActivity : AppCompatActivity() {
 
@@ -17,14 +22,13 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // ---- Bottom Navigation 설정 ----
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.main_nav_host) as NavHostFragment
-        val navController = navHostFragment.navController
 
-        // BottomNavigationView 기본 연결
+        val navController = navHostFragment.navController
         binding.bottomNav.setupWithNavController(navController)
 
-        // BottomNavigationView 아이템 클릭 리스너
         binding.bottomNav.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.tab_schedule -> {
@@ -43,25 +47,57 @@ class MainActivity : AppCompatActivity() {
                     navController.navigate(R.id.analyticsFragment)
                     true
                 }
-                R.id.tab_settings -> {
-                    // SettingActivity를 열 때 홈 이동 신호 포함
-                    val intent = Intent(this, SettingActivity::class.java)
-                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-                    startActivity(intent)
-                    true
-                }
+
                 else -> false
             }
         }
-            // 앱 시작 시 Intent 확인 (SettingActivity에서 홈으로 돌아올 때)
+        // 🔥 앱이 처음 실행될 때 Intent의 딥링크도 처리해야 해서 onNewIntent도 호출
+        handleDeepLink(intent)
         handleIntent(intent)
     }
 
+    // ---------------------------------------------------------
+    // 🔥 초대 링크 Deep Link 처리
+    // ---------------------------------------------------------
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
+        handleDeepLink(intent)
         intent?.let { handleIntent(it) }
     }
 
+    private fun handleDeepLink(intent: Intent?) {
+        if (intent == null) return
+
+        Firebase.dynamicLinks
+            .getDynamicLink(intent)
+            .addOnSuccessListener { pendingDynamicLinkData ->
+                val deepLink = pendingDynamicLinkData?.link ?: return@addOnSuccessListener
+
+                val teamId = deepLink.getQueryParameter("teamId")
+
+                if (teamId != null) {
+                    joinTeam(teamId)
+                }
+            }
+    }
+
+    // ---------------------------------------------------------
+    // 🔥 팀 참여 기능: Firestore에 팀 멤버 등록
+    // ---------------------------------------------------------
+    private fun joinTeam(teamId: String) {
+        val user = Firebase.auth.currentUser ?: return
+
+        val memberData = mapOf(
+            "name" to (user.displayName ?: "이름없음"),
+            "joinedAt" to FieldValue.serverTimestamp()
+        )
+
+        Firebase.firestore.collection("teams")
+            .document(teamId)
+            .collection("members")
+            .document(user.uid)
+            .set(memberData)
+    }
     private fun handleIntent(intent: Intent) {
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.main_nav_host) as NavHostFragment
@@ -74,5 +110,6 @@ class MainActivity : AppCompatActivity() {
             binding.bottomNav.selectedItemId = R.id.tab_schedule
         }
     }
+
 }
 
