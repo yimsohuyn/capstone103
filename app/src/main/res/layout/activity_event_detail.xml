@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     android:background="@android:color/white">
 
-    <!-- 상단 앱바 -->
     <LinearLayout
         android:id="@+id/topBar"
         android:layout_width="0dp"
@@ -54,7 +53,6 @@
             android:background="@android:color/holo_blue_light" />
     </LinearLayout>
 
-    <!-- 내용 영역 (스크롤) -->
     <ScrollView
         android:id="@+id/scrollArea"
         android:layout_width="0dp"
@@ -70,14 +68,12 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- 날짜 + 시간 묶음 영역 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="12dp">
 
-                <!-- 날짜 줄 -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -113,8 +109,8 @@
                         android:textSize="16sp" />
                 </LinearLayout>
 
-                <!-- 시간 줄 -->
                 <LinearLayout
+                    android:id="@+id/timeLine"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
@@ -147,7 +143,6 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- ★ 상세 내용: 시간 줄 바로 아래, 시간과 같은 기준선에 맞춤 -->
             <TextView
                 android:id="@+id/tvDetail"
                 android:layout_width="match_parent"
@@ -161,7 +156,34 @@
                 android:maxLines="5"
                 android:ellipsize="end" />
 
-            <!-- 구분선 -->
+            <LinearLayout
+                android:id="@+id/layoutAlarmSetting"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="8dp"
+                android:paddingStart="42dp"
+                android:paddingEnd="16dp">
+
+                <TextView
+                    android:id="@+id/tvAlarmInfo"
+                    android:layout_width="295dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="알림 켜짐 (오전 10:30)"
+                    android:textColor="@android:color/holo_red_dark"
+                    android:textSize="15sp" />
+
+                <ImageButton
+                    android:id="@+id/btnAlarmToggle"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="알림 끄기 켜기"
+                    android:src="@drawable/outline_alarm_on_24"
+                    app:tint="@android:color/holo_red_dark" />
+            </LinearLayout>
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
@@ -169,7 +191,6 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"/>
 
-            <!-- 내 캘린더 영역 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -195,7 +216,6 @@
         </LinearLayout>
     </ScrollView>
 
-    <!-- 하단 버튼 바 -->
     <LinearLayout
         android:id="@+id/bottomBar"
         android:layout_width="0dp"
