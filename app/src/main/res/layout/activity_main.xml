@@ -5,22 +5,23 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@android:color/white"
     tools:context=".MainActivity">
 
-    <!-- 여기가 앞으로 모든 Fragment를 띄우는 영역 -->
+    <!-- 모든 Fragment를 띄우는 NavHostFragment -->
     <androidx.fragment.app.FragmentContainerView
-    android:id="@+id/main_nav_host"
-    android:layout_width="0dp"
-    android:layout_height="0dp"
-    android:name="androidx.navigation.fragment.NavHostFragment"
-    app:defaultNavHost="true"
-    app:navGraph="@navigation/main_nav_graph"
-    app:layout_constraintTop_toTopOf="parent"
-    app:layout_constraintBottom_toTopOf="@id/bottomNav"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintEnd_toEndOf="parent" />
+        android:id="@+id/main_nav_host"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        app:defaultNavHost="true"
+        app:navGraph="@navigation/main_nav_graph"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/bottomNav"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- 하단 네비게이션 (그대로 유지) -->
+    <!-- 하단 네비게이션 -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNav"
         android:layout_width="0dp"
@@ -32,10 +33,10 @@
         app:itemTextAppearanceInactive="@style/BottomNavTextInactive"
         app:itemTextColor="@color/nav_text_selector"
         app:labelVisibilityMode="labeled"
-        app:layout_constraintTop_toBottomOf="@+id/main_nav_host"
+        app:layout_constraintTop_toBottomOf="@id/main_nav_host"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:menu="@menu/menu_bottom_nav" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -22,38 +22,20 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // ---- Bottom Navigation 설정 ----
+        // NavController 가져오기
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.main_nav_host) as NavHostFragment
-
         val navController = navHostFragment.navController
+
+        // 🔗 BottomNavigationView 와 NavController 연결 (탭/뒤로가기 자동 처리)
         binding.bottomNav.setupWithNavController(navController)
 
-        binding.bottomNav.setOnItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.tab_schedule -> {
-                    navController.navigate(R.id.homeFragment)
-                    true
-                }
-                R.id.tab_tasks -> {
-                    navController.navigate(R.id.assignmentFragment)
-                    true
-                }
-                R.id.tab_notes -> {
-                    navController.navigate(R.id.notesFragment)
-                    true
-                }
-                R.id.tab_analytics -> {
-                    navController.navigate(R.id.analyticsFragment)
-                    true
-                }
+        // 같은 탭 다시 눌렀을 때 재네비게이션 방지 (선택 사항)
+        binding.bottomNav.setOnItemReselectedListener { /* 아무 것도 안 함 */ }
 
-                else -> false
-            }
-        }
-        // 🔥 앱이 처음 실행될 때 Intent의 딥링크도 처리해야 해서 onNewIntent도 호출
+        // 딥링크 & 인텐트 처리
         handleDeepLink(intent)
-        handleIntent(intent)
+        handleIntent(intent, navController)
     }
 
     // ---------------------------------------------------------
@@ -61,8 +43,13 @@ class MainActivity : AppCompatActivity() {
     // ---------------------------------------------------------
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
+
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.main_nav_host) as NavHostFragment
+        val navController = navHostFragment.navController
+
         handleDeepLink(intent)
-        intent?.let { handleIntent(it) }
+        intent?.let { handleIntent(it, navController) }
     }
 
     private fun handleDeepLink(intent: Intent?) {
@@ -98,18 +85,17 @@ class MainActivity : AppCompatActivity() {
             .document(user.uid)
             .set(memberData)
     }
-    private fun handleIntent(intent: Intent) {
-        val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.main_nav_host) as NavHostFragment
-        val navController = navHostFragment.navController
 
+    // ---------------------------------------------------------
+    // 🔥 다른 Activity에서 돌아올 때 홈으로 가는 처리
+    // ---------------------------------------------------------
+    private fun handleIntent(intent: Intent, navController: androidx.navigation.NavController) {
         // SettingActivity에서 뒤로가기 시 홈 Fragment로 이동
         val goToHome = intent.getBooleanExtra("go_to_home", false)
         if (goToHome) {
             navController.navigate(R.id.homeFragment)
-            binding.bottomNav.selectedItemId = R.id.tab_schedule
+            // setupWithNavController가 있어서 이 줄은 사실 없어도 되지만, 확실히 맞춰주고 싶으면 유지
+            binding.bottomNav.selectedItemId = R.id.homeFragment
         }
     }
-
 }
-

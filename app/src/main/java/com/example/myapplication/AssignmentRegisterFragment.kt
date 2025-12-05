@@ -25,6 +25,7 @@ class AssignmentRegisterFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_assignment_register, container, false)
 
         // ---- XML ID 연결 ----
+        val backBtn = view.findViewById<ImageButton>(R.id.btnBack)      // 🔙 뒤로가기 버튼
         val dueDateLayout = view.findViewById<LinearLayout>(R.id.dueDateLayout)
         val textDueDate = view.findViewById<TextView>(R.id.textDueDate)
 
@@ -33,6 +34,12 @@ class AssignmentRegisterFragment : Fragment() {
 
         val spinnerType = view.findViewById<Spinner>(R.id.spinnerType)
         val submitBtn = view.findViewById<Button>(R.id.btnSubmit)
+
+        // ---- 0) 뒤로가기 버튼 ----
+        backBtn.setOnClickListener {
+            // NavController 사용 중이니까 이게 가장 자연스러운 뒤로가기
+            findNavController().navigateUp()
+        }
 
         // ---- 1) DatePicker ----
         dueDateLayout.setOnClickListener {
@@ -89,6 +96,7 @@ class AssignmentRegisterFragment : Fragment() {
                     if (type == "팀 프로젝트") {
                         findNavController().navigate(R.id.teamProjectFragment)
                     } else {
+                        // 일반 과제면 이전 화면(과제 목록 Fragment 등)으로 돌아가기
                         findNavController().navigateUp()
                     }
                 }

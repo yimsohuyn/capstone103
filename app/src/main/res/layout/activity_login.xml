@@ -5,7 +5,17 @@
     android:gravity="center"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="24dp">
+    android:padding="24dp"
+    android:background="#FFFFFF">
+
+    <ImageView
+        android:id="@+id/ivSplashLogo"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:src="@drawable/logo_swm"
+        android:layout_marginBottom="24dp" />
+
 
     <EditText
         android:id="@+id/etEmail"
@@ -17,12 +27,11 @@
 
     <EditText
         android:id="@+id/etPassword"
-        android:hint="비밀번호"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="textPassword"
         android:layout_marginTop="16dp"
-        />
+        android:hint="비밀번호"
+        android:inputType="textPassword" />
 
     <Button
         android:id="@+id/btnLogin"

@@ -4,26 +4,46 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFF7FF"
+    android:background="@android:color/white"
     android:padding="16dp">
 
-    <!-- 상단 제목 -->
-    <TextView
-        android:id="@+id/tvTitle"
-        android:layout_width="wrap_content"
+    <!-- 상단 영역 (뒤로가기 + 제목 가운데 정렬) -->
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="학습 분석 화면"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="12dp" />
+        android:layout_marginBottom="12dp">
 
-    <!-- 🔽
- 여기부터 퀴즈 탭 영역 🔽
- -->
+        <!-- 뒤로가기 버튼 -->
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_back"
+            android:contentDescription="뒤로가기"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            app:tint="@android:color/black" />
+
+        <!-- 제목 텍스트 (가운데 정렬) -->
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="학습 분석 화면"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            android:layout_centerInParent="true" />
+
+    </RelativeLayout>
+
+    <!-- 🔽 여기부터 퀴즈 탭 영역 🔽 -->
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabLayoutQuiz"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@android:color/white"
         app:tabMode="fixed"
         app:tabGravity="fill">
 
