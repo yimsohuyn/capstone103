@@ -28,11 +28,17 @@
         android:layout_height="60dp"
         android:background="@android:color/white"
         android:elevation="10dp"
+
+        app:itemBackground="@android:color/transparent"
+        app:itemRippleColor="@android:color/transparent"
+        app:itemActiveIndicatorStyle="@android:color/transparent"
+
         app:itemIconSize="0dp"
         app:itemTextAppearanceActive="@style/BottomNavTextActive"
         app:itemTextAppearanceInactive="@style/BottomNavTextInactive"
         app:itemTextColor="@color/nav_text_selector"
         app:labelVisibilityMode="labeled"
+
         app:layout_constraintTop_toBottomOf="@id/main_nav_host"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
