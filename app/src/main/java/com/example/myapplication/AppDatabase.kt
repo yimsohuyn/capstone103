@@ -10,9 +10,9 @@ import androidx.room.RoomDatabase
         TeamMemberEntity::class,
         MeetingEntity::class,
         ProjectFileEntity::class,
-        AssignmentEntity::class     // ✅ 추가됨
+        AssignmentEntity::class
     ],
-    version = 2,                   // ✅ 반드시 버전 올려야 함!!!
+    version = 3,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -20,7 +20,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun teamMemberDao(): TeamMemberDao
     abstract fun meetingDao(): MeetingDao
     abstract fun projectFileDao(): ProjectFileDao
-    abstract fun assignmentDao(): AssignmentDao   // ✅ 추가됨
+    abstract fun assignmentDao(): AssignmentDao
+
 
     companion object {
         @Volatile
@@ -33,7 +34,7 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "team_project_db"
                 )
-                    .fallbackToDestructiveMigration()   // ✅ 버전 변경 시 충돌 방지 (중요)
+                    .fallbackToDestructiveMigration()
                     .build()
 
                 INSTANCE = instance

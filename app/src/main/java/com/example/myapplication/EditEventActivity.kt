@@ -1,279 +1,260 @@
 package com.example.myapplication
 
-import android.app.Activity
+import android.app.DatePickerDialog
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.InputFilter
+import android.text.TextWatcher
+import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
-import com.google.api.client.http.javanet.NetHttpTransport
-import com.google.api.client.json.gson.GsonFactory
-import com.google.api.client.util.DateTime
-import com.google.api.services.calendar.CalendarScopes
-import com.google.api.services.calendar.model.Event
-import com.google.api.services.calendar.model.EventDateTime
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Locale
 
 class EditEventActivity : AppCompatActivity() {
 
-    // 인텐트로 넘겨받는 값들
+    // 인텐트로 받은 값들
     private var eventId: String? = null
     private var startMillis: Long = -1L
     private var endMillis: Long = -1L
-    private var detail: String = ""
 
-    // 하루 종일 여부 + 원래 시간 저장
-    private var isAllDay: Boolean = false
-    private var originalStartTime: String = ""
-    private var originalEndTime: String = ""
+    // 날짜/시간 계산용 캘린더
+    private val startCal: Calendar = Calendar.getInstance()
+    private val endCal: Calendar = Calendar.getInstance()
 
-    // 구글 캘린더 서비스
-    private var calendarService: com.google.api.services.calendar.Calendar? = null
+    // 알림 관련
+    private var isAlarmOn: Boolean = false
+    private var alarmTime: String? = null
 
-    // UI
-    private lateinit var editTitle: EditText
-    private lateinit var editDetail: EditText
-    private lateinit var tvStartDate: TextView
-    private lateinit var tvEndDate: TextView
-    private lateinit var etStartTime: EditText
-    private lateinit var etEndTime: EditText
-    private lateinit var btnCancel: Button
-    private lateinit var btnSave: Button
-    private lateinit var switchAllDay: Switch
-
-    private val dateFormatter = SimpleDateFormat("M월 d일 (E)", Locale.KOREAN)
-    private val timeInputFormatter = SimpleDateFormat("HH:mm", Locale.KOREAN)
+    // 포맷터
+    private val dateFormatter = SimpleDateFormat("yyyy년 M월 d일 (E)", Locale.KOREAN)
+    private val timeFormatter = SimpleDateFormat("HH:mm", Locale.getDefault())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_event)
 
-        // 인텐트 데이터
+        // 1. Intent 데이터 수신
+        val title = intent.getStringExtra("title") ?: ""
+        val detail = intent.getStringExtra("detail") ?: ""
         eventId = intent.getStringExtra("eventId")
-        val oldTitle = intent.getStringExtra("title") ?: "제목 없음"
         startMillis = intent.getLongExtra("startMillis", -1L)
         endMillis = intent.getLongExtra("endMillis", -1L)
-        detail = intent.getStringExtra("detail") ?: ""
 
-        // UI 바인딩 (xml id와 맞춤)
-        editTitle = findViewById(R.id.editTitle)
-        editDetail = findViewById(R.id.etDetail)
+        isAlarmOn = intent.getBooleanExtra("isAlarmOn", false)
+        alarmTime = intent.getStringExtra("alarmTime") // "HHmm" 형태
 
-        tvStartDate = findViewById(R.id.editStartDate)
-        tvEndDate = findViewById(R.id.editEndDate)
-        etStartTime = findViewById(R.id.editStartTime)
-        etEndTime = findViewById(R.id.editEndTime)
+        // 2. UI 연결
+        val editTitle = findViewById<EditText>(R.id.editTitle)
+        val editStartDate = findViewById<TextView>(R.id.editStartDate)
+        val editStartTime = findViewById<EditText>(R.id.editStartTime)
+        val editEndDate = findViewById<TextView>(R.id.editEndDate)
+        val editEndTime = findViewById<EditText>(R.id.editEndTime)
+        val etDetail = findViewById<EditText>(R.id.etDetail)
 
-        btnCancel = findViewById(R.id.btnCancel)
-        btnSave = findViewById(R.id.btnSave)
-        switchAllDay = findViewById(R.id.switchAllDay)
+        val switchAllDay = findViewById<Switch>(R.id.switchAllDay)
+        val switchAlarm = findViewById<Switch>(R.id.switchAlarm)
+        val rowAlarmTime = findViewById<LinearLayout>(R.id.rowAlarmTime)
+        val editAlarmTime = findViewById<EditText>(R.id.editAlarmTime)
 
-        findViewById<ImageButton?>(R.id.btnBack)?.setOnClickListener { finish() }
+        val btnCancel = findViewById<Button>(R.id.btnCancel)
+        val btnSave = findViewById<Button>(R.id.btnSave)
+        val btnBack = findViewById<ImageButton>(R.id.btnBack)
 
-        // 기존 값 세팅
-        editTitle.setText(oldTitle)
-        editDetail.setText(detail)
-
-        if (startMillis > 0 && endMillis > 0) {
-            val start = Date(startMillis)
-            val end = Date(endMillis)
-
-            tvStartDate.text = dateFormatter.format(start)
-            tvEndDate.text = dateFormatter.format(end)
-            etStartTime.setText(timeInputFormatter.format(start)) // 예: 08:00
-            etEndTime.setText(timeInputFormatter.format(end))     // 예: 09:00
-        }
-
-        // "원래 시간" 기억해두기 (하루 종일 on/off 시 되돌릴 용도)
-        originalStartTime = etStartTime.text.toString()
-        originalEndTime = etEndTime.text.toString()
-
-        // 하루 종일 스위치 동작
-        switchAllDay.setOnCheckedChangeListener { _, checked ->
-            isAllDay = checked
-
-            if (checked) {
-                // UI 표시
-                etStartTime.setText("00:00")
-                etEndTime.setText("24:00")
-                etStartTime.isEnabled = false
-                etEndTime.isEnabled = false
-
-                // millis 를 00:00 ~ 다음날 00:00 으로 설정
-                val cal = Calendar.getInstance()
-                if (startMillis > 0) {
-                    cal.timeInMillis = startMillis
-                }
-                // 시작 날짜의 00:00
-                cal.set(Calendar.HOUR_OF_DAY, 0)
-                cal.set(Calendar.MINUTE, 0)
-                cal.set(Calendar.SECOND, 0)
-                cal.set(Calendar.MILLISECOND, 0)
-                startMillis = cal.timeInMillis
-
-                // 끝 시간 = 다음날 00:00
-                cal.add(Calendar.DAY_OF_MONTH, 1)
-                endMillis = cal.timeInMillis
-
-            } else {
-                // 다시 시간 수정 가능
-                etStartTime.isEnabled = true
-                etEndTime.isEnabled = true
-
-                etStartTime.setText(
-                    if (originalStartTime.isNotBlank()) originalStartTime else "09:00"
-                )
-                etEndTime.setText(
-                    if (originalEndTime.isNotBlank()) originalEndTime else "10:00"
-                )
-                // 사용자가 다시 숫자를 바꾸면 아래 normalizeTimeToMillis 가 millis 재계산
-            }
-        }
-
-        // 캘린더 서비스 생성
-        calendarService = buildCalendarService()
-
-        // 취소
-        btnCancel.setOnClickListener { finish() }
-
-        // 저장
-        btnSave.setOnClickListener {
-            val newTitle = editTitle.text.toString().ifBlank { "제목 없음" }
-            val newDetail = editDetail.text.toString()
-
-            if (!isAllDay) {
-                // 하루 종일이 아닐 때만 사용자가 입력한 시간을 파싱
-                val startText = etStartTime.text.toString().trim()
-                val endText = etEndTime.text.toString().trim()
-
-                if (startText.isNotEmpty()) {
-                    normalizeTimeToMillis(startText, true)
-                }
-                if (endText.isNotEmpty()) {
-                    normalizeTimeToMillis(endText, false)
-                }
-            }
-            // isAllDay 인 경우에는 위에서 startMillis/endMillis 를 이미 00:00~다음날 00:00 으로 맞춰둔 상태
-
-            updateEventOnCalendar(newTitle, newDetail)
-        }
-    }
-
-    /** 사용자 입력(숫자들) -> startMillis/endMillis 갱신 + 입력칸 포맷 정리 */
-    private fun normalizeTimeToMillis(raw: String, isStart: Boolean) {
-        val digits = raw.filter { it.isDigit() }
-        if (digits.isEmpty()) return
-
-        val padded = digits.padStart(4, '0').take(4)
-        val h = padded.substring(0, 2).toIntOrNull() ?: return
-        val m = padded.substring(2, 4).toIntOrNull() ?: return
-
-        val hour = h.coerceIn(0, 23)
-        val minute = m.coerceIn(0, 59)
-
-        val baseMillis = if (isStart) startMillis else endMillis
-        val cal = Calendar.getInstance()
-
-        if (baseMillis > 0) {
-            cal.timeInMillis = baseMillis
-        }
-
-        cal.set(Calendar.HOUR_OF_DAY, hour)
-        cal.set(Calendar.MINUTE, minute)
-        cal.set(Calendar.SECOND, 0)
-        cal.set(Calendar.MILLISECOND, 0)
-
-        val newMillis = cal.timeInMillis
-        val formatted = String.format("%02d:%02d", hour, minute)
-
-        if (isStart) {
-            startMillis = newMillis
-            etStartTime.setText(formatted)
+        // 3. 캘린더 초기화 (startMillis / endMillis 를 실제 날짜/시간으로 세팅)
+        if (startMillis > 0) {
+            startCal.timeInMillis = startMillis
         } else {
-            endMillis = newMillis
-            etEndTime.setText(formatted)
-        }
-    }
-
-    /** Google Calendar 서비스 생성 */
-    private fun buildCalendarService(): com.google.api.services.calendar.Calendar? {
-        val account = GoogleSignIn.getLastSignedInAccount(this) ?: return null
-
-        val credential = GoogleAccountCredential.usingOAuth2(
-            this,
-            listOf(CalendarScopes.CALENDAR)
-        )
-        credential.selectedAccount = account.account
-
-        return com.google.api.services.calendar.Calendar.Builder(
-            NetHttpTransport(),
-            GsonFactory.getDefaultInstance(),
-            credential
-        )
-            .setApplicationName(getString(R.string.app_name))
-            .build()
-    }
-
-    /** 실제로 Google Calendar 이벤트 수정 */
-    private fun updateEventOnCalendar(newTitle: String, newDetail: String) {
-        val id = eventId
-        val service = calendarService
-
-        if (id == null || service == null) {
-            Toast.makeText(this, "수정할 수 없는 일정입니다.", Toast.LENGTH_SHORT).show()
-            return
+            startCal.timeInMillis = System.currentTimeMillis()
         }
 
-        lifecycleScope.launch {
-            try {
-                withContext(Dispatchers.IO) {
-                    val event: Event = service.events().get("primary", id).execute()
+        if (endMillis > 0) {
+            endCal.timeInMillis = endMillis
+        } else {
+            endCal.timeInMillis = startCal.timeInMillis + 60 * 60 * 1000 // +1시간
+        }
 
-                    event.summary = newTitle
-                    event.description = newDetail
+        // 4. UI 초기값 세팅
+        editTitle.setText(title)
+        etDetail.setText(detail)
 
-                    if (startMillis > 0 && endMillis > 0) {
-                        val startDateTime = DateTime(startMillis)
-                        val endDateTime = DateTime(endMillis)
+        editStartDate.text = dateFormatter.format(startCal.time)
+        editEndDate.text = dateFormatter.format(endCal.time)
+        editStartTime.setText(timeFormatter.format(startCal.time))
+        editEndTime.setText(timeFormatter.format(endCal.time))
 
-                        if (event.start == null) event.start = EventDateTime()
-                        if (event.end == null) event.end = EventDateTime()
-
-                        event.start.dateTime = startDateTime
-                        event.start.date = null
-                        event.end.dateTime = endDateTime
-                        event.end.date = null
-                    }
-
-                    service.events().update("primary", id, event).execute()
-                }
-
-                Toast.makeText(this@EditEventActivity, "일정이 수정되었습니다.", Toast.LENGTH_SHORT)
-                    .show()
-
-                val resultIntent = Intent().apply {
-                    putExtra("title", newTitle)
-                    putExtra("detail", newDetail)
-                    putExtra("startMillis", startMillis)
-                    putExtra("endMillis", endMillis)
-                }
-                setResult(Activity.RESULT_OK, resultIntent)
-                finish()
-
-            } catch (e: Exception) {
-                e.printStackTrace()
-                Toast.makeText(
-                    this@EditEventActivity,
-                    "수정 중 오류가 발생했습니다.",
-                    Toast.LENGTH_LONG
-                ).show()
+        // 알림 초기값
+        switchAlarm.isChecked = isAlarmOn
+        if (isAlarmOn) {
+            rowAlarmTime.visibility = View.VISIBLE
+            if (!alarmTime.isNullOrEmpty() && alarmTime!!.length == 4) {
+                val formatted = "${alarmTime!!.substring(0, 2)}:${alarmTime!!.substring(2, 4)}"
+                editAlarmTime.setText(formatted)
             }
+        } else {
+            rowAlarmTime.visibility = View.GONE
+        }
+
+        // ───────── 시간 입력 포맷터 (자동 콜론) ─────────
+        class TimeFormattingTextWatcher(private val editText: EditText) : TextWatcher {
+            private var isFormatting = false
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                if (isFormatting || s == null) return
+                isFormatting = true
+
+                val digits = s.toString().replace(Regex("[^\\d]"), "")
+                val trimmed = if (digits.length > 4) digits.substring(0, 4) else digits
+
+                val formatted = StringBuilder()
+                for (i in trimmed.indices) {
+                    if (i == 2) formatted.append(":")
+                    formatted.append(trimmed[i])
+                }
+
+                if (s.toString() != formatted.toString()) {
+                    editText.setText(formatted.toString())
+                    editText.setSelection(formatted.length)
+                }
+                isFormatting = false
+            }
+        }
+
+        val lengthFilter = InputFilter.LengthFilter(5)
+        editStartTime.filters = arrayOf(lengthFilter)
+        editEndTime.filters = arrayOf(lengthFilter)
+        editAlarmTime.filters = arrayOf(lengthFilter)
+
+        editStartTime.addTextChangedListener(TimeFormattingTextWatcher(editStartTime))
+        editEndTime.addTextChangedListener(TimeFormattingTextWatcher(editEndTime))
+        editAlarmTime.addTextChangedListener(TimeFormattingTextWatcher(editAlarmTime))
+
+        // ───────── 날짜 선택 (DatePickerDialog) ─────────
+        fun showDatePicker(isStart: Boolean) {
+            val cal = if (isStart) startCal else endCal
+
+            val listener = DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
+                cal.set(year, month, dayOfMonth)
+
+                if (isStart) {
+                    editStartDate.text = dateFormatter.format(cal.time)
+                } else {
+                    editEndDate.text = dateFormatter.format(cal.time)
+                }
+            }
+
+            DatePickerDialog(
+                this,
+                listener,
+                cal.get(Calendar.YEAR),
+                cal.get(Calendar.MONTH),
+                cal.get(Calendar.DAY_OF_MONTH)
+            ).show()
+        }
+
+        editStartDate.setOnClickListener { showDatePicker(isStart = true) }
+        editEndDate.setOnClickListener { showDatePicker(isStart = false) }
+
+        // ───────── 하루 종일 스위치 ─────────
+        switchAllDay.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                // 단순히 00:00 ~ 23:59 로 고정 + 입력 비활성화
+                editStartTime.setText("00:00")
+                editEndTime.setText("23:59")
+                editStartTime.isEnabled = false
+                editEndTime.isEnabled = false
+            } else {
+                editStartTime.isEnabled = true
+                editEndTime.isEnabled = true
+            }
+        }
+
+        // ───────── 알림 스위치 ─────────
+        switchAlarm.setOnCheckedChangeListener { _, checked ->
+            isAlarmOn = checked
+            rowAlarmTime.visibility = if (checked) View.VISIBLE else View.GONE
+        }
+
+        // ───────── 버튼 리스너 ─────────
+        btnCancel.setOnClickListener { finish() }
+        btnBack.setOnClickListener { finish() }
+
+        btnSave.setOnClickListener {
+            val newTitle = editTitle.text.toString().trim()
+            val newDetail = etDetail.text.toString().trim()
+
+            if (newTitle.isEmpty()) {
+                Toast.makeText(this, "제목을 입력해주세요.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            // 시간 파싱 함수
+            fun parseTime(text: String, label: String): Pair<Int, Int>? {
+                val raw = text.replace(":", "").trim()
+                if (raw.length != 4) {
+                    Toast.makeText(this, "$label 을(를) 정확히 입력해주세요 (예: 09:30)", Toast.LENGTH_SHORT).show()
+                    return null
+                }
+                val h = raw.substring(0, 2).toIntOrNull()
+                val m = raw.substring(2, 4).toIntOrNull()
+                if (h == null || m == null || h !in 0..23 || m !in 0..59) {
+                    Toast.makeText(this, "$label 값이 올바르지 않습니다.", Toast.LENGTH_SHORT).show()
+                    return null
+                }
+                return h to m
+            }
+
+            // 시작/종료 시간 반영
+            val (startH, startM) = parseTime(editStartTime.text.toString(), "시작 시간") ?: return@setOnClickListener
+            val (endH, endM) = parseTime(editEndTime.text.toString(), "종료 시간") ?: return@setOnClickListener
+
+            startCal.set(Calendar.HOUR_OF_DAY, startH)
+            startCal.set(Calendar.MINUTE, startM)
+            startCal.set(Calendar.SECOND, 0)
+            startCal.set(Calendar.MILLISECOND, 0)
+
+            endCal.set(Calendar.HOUR_OF_DAY, endH)
+            endCal.set(Calendar.MINUTE, endM)
+            endCal.set(Calendar.SECOND, 0)
+            endCal.set(Calendar.MILLISECOND, 0)
+
+            // (선택) 종료 시간이 시작 시간보다 빠르면 오류
+            if (endCal.timeInMillis <= startCal.timeInMillis) {
+                Toast.makeText(this, "종료 시간이 시작 시간보다 늦어야 합니다.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            startMillis = startCal.timeInMillis
+            endMillis = endCal.timeInMillis
+
+            // 알림 시간 처리
+            var newAlarmTimeStr: String? = null
+            if (isAlarmOn) {
+                val rawTime = editAlarmTime.text.toString().replace(":", "").trim()
+                if (rawTime.length != 4) {
+                    Toast.makeText(this, "알림 시간을 정확히 입력해주세요 (예: 09:00)", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+                newAlarmTimeStr = rawTime
+            }
+
+            // 결과 인텐트
+            val resultIntent = Intent().apply {
+                putExtra("eventId", eventId)
+                putExtra("title", newTitle)
+                putExtra("detail", newDetail)
+                putExtra("startMillis", startMillis)
+                putExtra("endMillis", endMillis)
+                putExtra("isAlarmOn", isAlarmOn)
+                putExtra("alarmTime", newAlarmTimeStr)
+            }
+
+            setResult(RESULT_OK, resultIntent)
+            finish()
         }
     }
 }

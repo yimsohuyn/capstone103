@@ -3,9 +3,10 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@android:color/white">
 
-    <!-- 상단 바 -->
+    <!-- 상단 바 : 뒤로가기 + 제목 -->
     <LinearLayout
         android:id="@+id/topBar"
         android:layout_width="0dp"
@@ -24,7 +25,7 @@
             android:layout_height="32dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_back"
-            android:contentDescription="뒤로가기"/>
+            android:contentDescription="뒤로가기" />
 
         <TextView
             android:layout_width="0dp"
@@ -33,14 +34,15 @@
             android:layout_weight="1"
             android:text="일정 편집"
             android:textSize="18sp"
-            android:textStyle="bold"/>
+            android:textStyle="bold" />
     </LinearLayout>
 
-    <!-- 내용 영역 -->
+    <!-- 내용 스크롤 영역 -->
     <ScrollView
         android:id="@+id/scrollArea"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:fillViewport="true"
         app:layout_constraintTop_toBottomOf="@id/topBar"
         app:layout_constraintBottom_toTopOf="@id/bottomBar"
         app:layout_constraintStart_toStartOf="parent"
@@ -59,13 +61,13 @@
                 android:layout_height="wrap_content"
                 android:hint="일정 제목"
                 android:textSize="18sp"
-                android:singleLine="true"/>
+                android:singleLine="true" />
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginTop="8dp"
-                android:background="#E0E0E0"/>
+                android:background="#E0E0E0" />
 
             <!-- 하루 종일 스위치 -->
             <LinearLayout
@@ -81,15 +83,15 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="하루 종일"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp" />
 
                 <Switch
                     android:id="@+id/switchAllDay"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content" />
             </LinearLayout>
 
-            <!-- 시작 날짜/시간 -->
+            <!-- 시작 날짜 / 시간 -->
             <LinearLayout
                 android:id="@+id/rowStart"
                 android:layout_width="match_parent"
@@ -103,8 +105,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="시작"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp" />
 
+                <!-- 🔹 날짜 : 클릭해서 DatePicker 띄우는 용도 -->
                 <TextView
                     android:id="@+id/editStartDate"
                     android:layout_width="0dp"
@@ -112,9 +115,12 @@
                     android:layout_weight="1"
                     android:layout_marginStart="16dp"
                     android:text="11월 18일 (화)"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/selectableItemBackgroundBorderless" />
 
-                <!-- ★ 여기 TextView → EditText 로 변경 -->
+                <!-- 시간 입력 -->
                 <EditText
                     android:id="@+id/editStartTime"
                     android:layout_width="wrap_content"
@@ -123,10 +129,10 @@
                     android:hint="08:00"
                     android:inputType="number"
                     android:maxLength="5"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp" />
             </LinearLayout>
 
-            <!-- 끝 날짜/시간 -->
+            <!-- 종료 날짜 / 시간 -->
             <LinearLayout
                 android:id="@+id/rowEnd"
                 android:layout_width="match_parent"
@@ -140,8 +146,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="종료"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp" />
 
+                <!-- 🔹 날짜 : 클릭해서 DatePicker 띄우는 용도 -->
                 <TextView
                     android:id="@+id/editEndDate"
                     android:layout_width="0dp"
@@ -149,9 +156,12 @@
                     android:layout_weight="1"
                     android:layout_marginStart="16dp"
                     android:text="11월 18일 (화)"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/selectableItemBackgroundBorderless" />
 
-                <!-- ★ 여기도 TextView → EditText -->
+                <!-- 시간 입력 -->
                 <EditText
                     android:id="@+id/editEndTime"
                     android:layout_width="wrap_content"
@@ -160,16 +170,14 @@
                     android:hint="09:00"
                     android:inputType="number"
                     android:maxLength="5"
-                    android:textSize="16sp"/>
-
+                    android:textSize="16sp" />
             </LinearLayout>
 
+            <!-- 상세 내용 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
                 android:paddingTop="12dp">
 
                 <TextView
@@ -192,14 +200,69 @@
                     android:textSize="15sp" />
             </LinearLayout>
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#E0E0E0"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp" />
 
+            <!-- 알림 스위치 -->
+            <LinearLayout
+                android:id="@+id/rowAlarm"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp">
 
-            <!-- 필요하면 위치/메모 같은 줄 더 추가 가능 -->
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="알림"
+                    android:textSize="16sp" />
+
+                <Switch
+                    android:id="@+id/switchAlarm"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <!-- 알림 시간 -->
+            <LinearLayout
+                android:id="@+id/rowAlarmTime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingTop="0dp"
+                android:paddingBottom="12dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="시간"
+                    android:textSize="16sp"
+                    android:textColor="#666666" />
+
+                <EditText
+                    android:id="@+id/editAlarmTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="36dp"
+                    android:hint="09:00"
+                    android:inputType="number"
+                    android:maxLength="5"
+                    android:textSize="16sp" />
+            </LinearLayout>
 
         </LinearLayout>
     </ScrollView>
 
-    <!-- 하단 버튼 -->
+    <!-- 하단 버튼 영역 -->
     <LinearLayout
         android:id="@+id/bottomBar"
         android:layout_width="0dp"
@@ -215,14 +278,14 @@
             android:id="@+id/btnCancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="취소"/>
+            android:text="취소" />
 
         <Button
             android:id="@+id/btnSave"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
-            android:text="저장"/>
+            android:text="저장" />
 
     </LinearLayout>
 

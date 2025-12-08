@@ -7,6 +7,7 @@
     android:orientation="vertical"
     android:padding="16dp">
 
+    <!-- 상단 바(뒤로가기 + 제목) -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -37,6 +38,7 @@
             app:layout_constraintBottom_toBottomOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <!-- 내용 영역: 스크롤 가능 -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -48,6 +50,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <!-- 일정 제목 -->
             <EditText
                 android:id="@+id/editScheduleTitle"
                 android:layout_width="match_parent"
@@ -57,6 +60,7 @@
                 android:maxLines="1"
                 android:singleLine="true" />
 
+            <!-- 날짜 라벨 -->
             <TextView
                 android:id="@+id/tvDateLabel"
                 android:layout_width="wrap_content"
@@ -66,6 +70,63 @@
                 android:textStyle="bold"
                 android:layout_marginTop="20dp" />
 
+            <!-- 시작 / 종료 날짜 표시 + 선택 영역 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp">
+
+                <!-- 시작 날짜 -->
+                <LinearLayout
+                    android:id="@+id/layoutStartDate"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:padding="8dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="시작 날짜"
+                        android:textSize="13sp"/>
+
+                    <TextView
+                        android:id="@+id/tvStartDateValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="----"
+                        android:textStyle="bold"
+                        android:textSize="15sp"/>
+                </LinearLayout>
+
+                <!-- 종료 날짜 -->
+                <LinearLayout
+                    android:id="@+id/layoutEndDate"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:padding="8dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="종료 날짜"
+                        android:textSize="13sp"/>
+
+                    <TextView
+                        android:id="@+id/tvEndDateValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="----"
+                        android:textStyle="bold"
+                        android:textSize="15sp"/>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- 한 개의 DatePicker (선택 중인 쪽에 적용) -->
             <DatePicker
                 android:id="@+id/datePicker"
                 android:layout_width="match_parent"
@@ -73,6 +134,7 @@
                 android:calendarViewShown="true"
                 android:spinnersShown="false" />
 
+            <!-- 시간 -->
             <TextView
                 android:id="@+id/tvTimeLabel"
                 android:layout_width="wrap_content"
@@ -117,16 +179,32 @@
                     android:textSize="15sp" />
             </LinearLayout>
 
-            <EditText
-                android:id="@+id/editScheduleDetail"
+            <!-- 상세 내용 + 밑줄 -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="상세 내용"
-                android:inputType="textMultiLine"
-                android:minLines="3"
-                android:gravity="top|start"
-                android:layout_marginTop="8dp" />
+                android:orientation="vertical"
+                android:layout_marginTop="8dp">
 
+                <EditText
+                    android:id="@+id/editScheduleDetail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="상세 내용"
+                    android:inputType="textMultiLine"
+                    android:lines="1"
+                    android:minLines="1"
+                    android:maxLines="5"
+                    android:gravity="center_vertical|start"
+                    android:layout_marginTop="8dp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#BDBDBD" />
+            </LinearLayout>
+
+            <!-- 알림 헤더 -->
             <LinearLayout
                 android:id="@+id/layoutAlarmHeader"
                 android:layout_width="match_parent"
@@ -154,6 +232,7 @@
                     app:tint="@android:color/black" />
             </LinearLayout>
 
+            <!-- 알림 상세 -->
             <LinearLayout
                 android:id="@+id/layoutAlarmDetail"
                 android:layout_width="match_parent"
@@ -185,6 +264,7 @@
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
+    <!-- 하단 저장 버튼 -->
     <Button
         android:id="@+id/btnSaveSchedule"
         android:layout_width="match_parent"

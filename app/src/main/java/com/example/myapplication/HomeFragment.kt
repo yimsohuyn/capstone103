@@ -2,7 +2,6 @@ package com.example.myapplication
 
 import android.app.Activity
 import android.app.Activity.RESULT_OK
-import android.app.AlertDialog
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.Typeface
@@ -39,8 +38,8 @@ import java.text.SimpleDateFormat
 import java.util.Calendar as JavaCalendar
 import java.util.Date
 import java.util.Locale
-import kotlin.collections.orEmpty
 
+// 앱 내부 로컬 일정 데이터 (time = 시작 시간)
 data class Schedule(
     val title: String,
     val time: String? = "시간 미지정"
@@ -49,14 +48,21 @@ data class Schedule(
 class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
-    private val binding get() = _binding!!   // ← 이건 onCreateView~onDestroyView 사이에서만 사용
+    private val binding get() = _binding!!
 
     // 구글 로그인 / 캘린더
     private lateinit var googleSignInClient: GoogleSignInClient
     private var calendarService: Calendar? = null
     private var ddayDialog: DdayDialogFragment? = null
 
-    // setting
+    // 날짜 + 시간 포맷
+    private var selectedDateMillis: Long = System.currentTimeMillis()
+    private val timeFormatter = SimpleDateFormat("HH:mm", Locale.getDefault())
+
+    // 앱 내부에서 관리하는 로컬 일정 (구글 계정 X 일 때만 사용)
+    private val schedulesByDate = mutableMapOf<Long, MutableList<Schedule>>()
+
+    // 설정 화면 → 돌아왔을 때
     private val settingLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
@@ -69,23 +75,28 @@ class HomeFragment : Fragment() {
                     showStatus("구글 계정을 연결해주세요.")
                     _binding?.calendarEventsContainer?.removeAllViews()
                 }
-                fetchEventsForSelectedDay()
+
+                // 다시 그리기
+                if (calendarService != null) {
+                    fetchEventsForSelectedDay()
+                } else {
+                    renderSchedulesForDate(selectedDateMillis)
+                }
+
                 ddayDialog?.refreshFromParent()
             }
         }
 
-    // 날짜 + 시간 포맷
-    private var selectedDateMillis: Long = System.currentTimeMillis()
-    private val timeFormatter = SimpleDateFormat("HH:mm", Locale.getDefault())
-
-    // 앱 내부에서 관리하는 로컬 일정
-    private val schedulesByDate = mutableMapOf<Long, MutableList<Schedule>>()
-
+    // 상세 화면에서 돌아왔을 때
     private val detailLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
-                fetchEventsForSelectedDay()      // 홈 화면 갱신 (네가 만든 함수)
-                ddayDialog?.refreshFromParent()  // 팝업 안 리스트 갱신
+                if (calendarService != null) {
+                    fetchEventsForSelectedDay()
+                } else {
+                    renderSchedulesForDate(selectedDateMillis)
+                }
+                ddayDialog?.refreshFromParent()
             }
         }
 
@@ -136,7 +147,21 @@ class HomeFragment : Fragment() {
         // 이미 로그인 되어 있으면 바로 연동
         GoogleSignIn.getLastSignedInAccount(requireContext())?.let {
             onAccountSignedIn(it)
-        } ?: showStatus("구글 계정을 연결해주세요.")
+        } ?: run {
+            calendarService = null
+            showStatus("구글 계정을 연결해주세요.")
+            renderSchedulesForDate(selectedDateMillis)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (calendarService != null) {
+            fetchEventsForSelectedDay()
+            ddayDialog?.refreshFromParent()
+        } else {
+            renderSchedulesForDate(selectedDateMillis)
+        }
     }
 
     // -------------------- 초기 설정 --------------------
@@ -150,32 +175,7 @@ class HomeFragment : Fragment() {
 
         googleSignInClient = GoogleSignIn.getClient(requireContext(), gso)
     }
-    //=====================bell 관련=================
-    private fun openDdayPopup() {
-        val dialog = DdayDialogFragment().apply {
-            this.calendarService = this@HomeFragment.calendarService
 
-            this.onEventClick = { item ->
-                val intent = Intent(requireContext(), EventDetailActivity::class.java).apply {
-                    putExtra("title", item.title)
-                    putExtra("eventId", item.eventId)
-                    putExtra("htmlLink", item.htmlLink)
-                    putExtra("startMillis", item.startMillis)
-                    putExtra("endMillis", item.endMillis)
-                }
-                detailLauncher.launch(intent)   // 이미 HomeFragment 에 있는 런처
-            }
-        }
-        ddayDialog = dialog
-        dialog.show(parentFragmentManager, "ddayDialog")
-    }
-
-    override fun onResume() {
-        super.onResume()
-        fetchEventsForSelectedDay()
-        ddayDialog?.refreshFromParent()
-    }
-    //=============================================
     private fun initTopMenu() {
         binding.searchIcon.setOnClickListener {
             startActivity(Intent(requireContext(), SearchActivity::class.java))
@@ -191,13 +191,17 @@ class HomeFragment : Fragment() {
         }
     }
 
-
     private fun initCalendarUi() {
         // 처음 선택 날짜
         selectedDateMillis = binding.calendarView.date
-        renderSchedulesForDate(selectedDateMillis)
 
-        // 날짜 바뀔 때마다 로컬 + 구글 일정 갱신
+        if (calendarService != null) {
+            fetchEventsForSelectedDay()
+        } else {
+            renderSchedulesForDate(selectedDateMillis)
+        }
+
+        // 날짜 바뀔 때마다 로컬 또는 구글 일정 갱신
         binding.calendarView.setOnDateChangeListener { _, year, month, dayOfMonth ->
             val cal = JavaCalendar.getInstance().apply {
                 set(year, month, dayOfMonth, 0, 0, 0)
@@ -205,23 +209,39 @@ class HomeFragment : Fragment() {
             }
             selectedDateMillis = cal.timeInMillis
 
-            renderSchedulesForDate(selectedDateMillis)
-            fetchEventsForSelectedDay()
+            if (calendarService != null) {
+                fetchEventsForSelectedDay()
+            } else {
+                renderSchedulesForDate(selectedDateMillis)
+            }
         }
-
-//        // 구글 캘린더 연동 버튼
-//        binding.syncCalendarButton.setOnClickListener {
-//            googleSignInClient.signOut().addOnCompleteListener {
-//                signInLauncher.launch(googleSignInClient.signInIntent)
-//                showStatus("로그인 화면을 표시합니다.")
-//            }
-//        }
     }
 
     private fun initFab() {
         binding.fabAdd.setOnClickListener {
             showScheduleBottomSheet()
         }
+    }
+
+    // -------------------- D-day 팝업 --------------------
+
+    private fun openDdayPopup() {
+        val dialog = DdayDialogFragment().apply {
+            this.calendarService = this@HomeFragment.calendarService
+
+            this.onEventClick = { item ->
+                val intent = Intent(requireContext(), EventDetailActivity::class.java).apply {
+                    putExtra("title", item.title)
+                    putExtra("eventId", item.eventId)
+                    putExtra("htmlLink", item.htmlLink)
+                    putExtra("startMillis", item.startMillis)
+                    putExtra("endMillis", item.endMillis)
+                }
+                detailLauncher.launch(intent)
+            }
+        }
+        ddayDialog = dialog
+        dialog.show(parentFragmentManager, "ddayDialog")
     }
 
     // -------------------- 구글 계정 / 캘린더 --------------------
@@ -241,9 +261,6 @@ class HomeFragment : Fragment() {
             .setApplicationName(getString(R.string.app_name))
             .build()
 
-        // 🔐 View가 이미 파괴된 상태일 수 있으니 가드
-        val b = _binding ?: return
-//        b.syncCalendarButton.text = "일정 새로고침"
         showStatus(account.email ?: "Google 계정 연결됨")
         fetchEventsForSelectedDay()
     }
@@ -251,13 +268,13 @@ class HomeFragment : Fragment() {
     private fun fetchEventsForSelectedDay() {
         val service = calendarService
         if (service == null) {
+            renderSchedulesForDate(selectedDateMillis)
             showStatus("구글 계정을 먼저 연결해주세요.")
             return
         }
 
         showStatus("일정을 불러오는 중입니다...")
 
-        // ✅ viewLifecycleOwner 기반 → View가 사라지면 코루틴도 자동 cancel
         viewLifecycleOwner.lifecycleScope.launch {
             try {
                 val (timeMin, timeMax) = withContext(Dispatchers.Default) {
@@ -274,7 +291,6 @@ class HomeFragment : Fragment() {
                         .items.orEmpty()
                 }
 
-                // 🔐 View 사라졌으면 더 이상 UI 건들지 말고 종료
                 if (_binding == null) return@launch
 
                 renderGoogleEvents(items)
@@ -309,7 +325,7 @@ class HomeFragment : Fragment() {
     // -------------------- 구글 일정 UI --------------------
 
     private fun renderGoogleEvents(events: List<Event>) {
-        val b = _binding ?: return   // 🔐 가드
+        val b = _binding ?: return
         b.calendarEventsContainer.removeAllViews()
 
         if (events.isEmpty()) {
@@ -325,9 +341,6 @@ class HomeFragment : Fragment() {
         events.forEach { event ->
             b.calendarEventsContainer.addView(createEventRow(event))
         }
-
-        // 구글 일정 아래에 로컬 일정도 이어서 붙이고 싶으면 여기에 호출
-        renderSchedulesForDate(selectedDateMillis)
     }
 
     private fun createEventRow(event: Event): LinearLayout {
@@ -393,40 +406,72 @@ class HomeFragment : Fragment() {
         bottomSheet.listener = object : ScheduleBottomSheetFragment.OnScheduleAddedListener {
             override fun onScheduleAdded(
                 title: String,
-                year: Int,
-                month: Int,
-                day: Int,
-                time: String?,
+                startYear: Int,
+                startMonth: Int,
+                startDay: Int,
+                endYear: Int,
+                endMonth: Int,
+                endDay: Int,
+                startTime: String?,
+                endTime: String?,
                 detail: String?,
                 isAlarmOn: Boolean,
                 alarmTime: String?
-
             ) {
-                val cal = JavaCalendar.getInstance().apply {
-                    set(year, month, day, 0, 0, 0)
+                // 로컬 일정은 "시작 날짜 기준"으로만 저장
+                val calStart = JavaCalendar.getInstance().apply {
+                    set(startYear, startMonth, startDay, 0, 0, 0)
                     set(JavaCalendar.MILLISECOND, 0)
                 }
-                val dateMillis = cal.timeInMillis
+                val dateMillis = calStart.timeInMillis
 
+                // ✅ 구글 계정이 연결되어 있으면 → 구글 캘린더에만 추가
+                if (calendarService != null) {
+                    addEventToGoogleCalendar(
+                        title = title,
+                        startYear = startYear,
+                        startMonth = startMonth,
+                        startDay = startDay,
+                        endYear = endYear,
+                        endMonth = endMonth,
+                        endDay = endDay,
+                        startTime = startTime,
+                        endTime = endTime,
+                        detail = detail
+                    )
+                    return
+                }
+
+                // ✅ 구글 계정이 없으면 → 로컬 일정으로만 관리
                 val list = schedulesByDate.getOrPut(dateMillis) { mutableListOf() }
-                list.add(Schedule(title, time ?: "시간 미지정"))
+                list.add(Schedule(title, startTime ?: "시간 미지정"))
 
                 if (selectedDateMillis == dateMillis) {
                     renderSchedulesForDate(selectedDateMillis)
                 }
 
                 Toast.makeText(requireContext(), "앱에 일정이 추가되었습니다.", Toast.LENGTH_SHORT).show()
-
-                addEventToGoogleCalendar(title, year, month, day, time, detail)
             }
         }
         bottomSheet.show(parentFragmentManager, "ScheduleBottomSheet")
     }
 
-    // 로컬 일정 리스트 표시 (구글 일정 아래에 append 방식)
+    // 로컬 일정 리스트 표시 (구글 계정이 없을 때만 사용)
     private fun renderSchedulesForDate(dateMillis: Long) {
-        val b = _binding ?: return   // 🔐 가드
-        val list = schedulesByDate[dateMillis] ?: return
+        val b = _binding ?: return
+        val list = schedulesByDate[dateMillis]
+
+        b.calendarEventsContainer.removeAllViews()
+
+        if (list.isNullOrEmpty()) {
+            b.calendarEventsContainer.addView(
+                TextView(requireContext()).apply {
+                    text = "선택한 날짜에 일정이 없습니다."
+                    setTextColor(Color.DKGRAY)
+                }
+            )
+            return
+        }
 
         list.forEach { schedule ->
             val row = LinearLayout(requireContext()).apply {
@@ -459,12 +504,26 @@ class HomeFragment : Fragment() {
         }
     }
 
+    // 시간 문자열 "HH:mm" → Pair(h, m) 로 변환
+    private fun parseTime(time: String?): Pair<Int, Int>? {
+        if (time.isNullOrBlank()) return null
+        val parts = time.split(":")
+        if (parts.size != 2) return null
+        val h = parts[0].toIntOrNull() ?: return null
+        val m = parts[1].toIntOrNull() ?: return null
+        return h to m
+    }
+
     private fun addEventToGoogleCalendar(
         title: String,
-        year: Int,
-        month: Int,
-        day: Int,
-        time: String?,
+        startYear: Int,
+        startMonth: Int,
+        startDay: Int,
+        endYear: Int,
+        endMonth: Int,
+        endDay: Int,
+        startTime: String?,
+        endTime: String?,
         detail: String?
     ) {
         val service = calendarService
@@ -473,25 +532,38 @@ class HomeFragment : Fragment() {
             return
         }
 
+        // 시작 시간
+        val (sh, sm) = parseTime(startTime) ?: (9 to 0)  // 기본 09:00
         val calStart = JavaCalendar.getInstance().apply {
-            set(year, month, day)
-
-            if (!time.isNullOrBlank() && time.contains(":")) {
-                val parts = time.split(":")
-                val h = parts.getOrNull(0)?.toIntOrNull() ?: 9
-                val m = parts.getOrNull(1)?.toIntOrNull() ?: 0
-                set(JavaCalendar.HOUR_OF_DAY, h)
-                set(JavaCalendar.MINUTE, m)
-            } else {
-                set(JavaCalendar.HOUR_OF_DAY, 9)
-                set(JavaCalendar.MINUTE, 0)
-            }
+            set(startYear, startMonth, startDay)
+            set(JavaCalendar.HOUR_OF_DAY, sh)
+            set(JavaCalendar.MINUTE, sm)
             set(JavaCalendar.SECOND, 0)
             set(JavaCalendar.MILLISECOND, 0)
         }
 
-        val calEnd = calStart.clone() as JavaCalendar
-        calEnd.add(JavaCalendar.HOUR_OF_DAY, 1)
+        // 종료 시간 (없으면: 같은 날이면 +1시간, 날짜 다르면 23:59)
+        val calEnd = JavaCalendar.getInstance().apply {
+            set(endYear, endMonth, endDay)
+
+            val parsedEnd = parseTime(endTime)
+            if (parsedEnd != null) {
+                set(JavaCalendar.HOUR_OF_DAY, parsedEnd.first)
+                set(JavaCalendar.MINUTE, parsedEnd.second)
+            } else {
+                if (startYear == endYear && startMonth == endMonth && startDay == endDay) {
+                    set(JavaCalendar.HOUR_OF_DAY, sh)
+                    set(JavaCalendar.MINUTE, sm)
+                    add(JavaCalendar.HOUR_OF_DAY, 1)
+                } else {
+                    set(JavaCalendar.HOUR_OF_DAY, 23)
+                    set(JavaCalendar.MINUTE, 59)
+                }
+            }
+
+            set(JavaCalendar.SECOND, 0)
+            set(JavaCalendar.MILLISECOND, 0)
+        }
 
         val startDateTime = DateTime(calStart.timeInMillis)
         val endDateTime = DateTime(calEnd.timeInMillis)
@@ -511,7 +583,7 @@ class HomeFragment : Fragment() {
                         .execute()
                 }
 
-                if (_binding == null) return@launch   // 🔐 View 사라졌으면 토스트만 스킵
+                if (_binding == null) return@launch
 
                 Toast.makeText(
                     requireContext(),
@@ -538,7 +610,6 @@ class HomeFragment : Fragment() {
     // -------------------- 공통 --------------------
 
     private fun showStatus(message: String) {
-        // 🔐 여기서 binding!! 쓰면 바로 NPE라 _binding 체크 후 사용
         _binding?.let { b ->
             b.statusTextView.text = message
         }
