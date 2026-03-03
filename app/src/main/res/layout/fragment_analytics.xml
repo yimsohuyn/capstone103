@@ -4,7 +4,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
+    android:background="@color/background_primary"
     android:padding="16dp">
 
     <!-- 상단 영역 (뒤로가기 + 제목 가운데 정렬) -->
@@ -23,7 +23,7 @@
             android:contentDescription="뒤로가기"
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
-            app:tint="@android:color/black" />
+            app:tint="@color/icon_primary" />
 
         <!-- 제목 텍스트 (가운데 정렬) -->
         <TextView
@@ -33,7 +33,7 @@
             android:text="학습 분석 화면"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:textColor="@android:color/black"
+            android:textColor="@color/text_primary"
             android:layout_centerInParent="true" />
 
     </RelativeLayout>
@@ -43,9 +43,14 @@
         android:id="@+id/tabLayoutQuiz"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/white"
+        android:background="@color/background_primary"
         app:tabMode="fixed"
-        app:tabGravity="fill">
+        app:tabGravity="fill"
+
+        app:tabTextColor="@color/tab_text_normal"
+        app:tabSelectedTextColor="@color/tab_text_selected"
+        app:tabIndicatorColor="@color/tab_indicator"
+        app:tabSelectedTextAppearance="@style/TabTextSelected" >
 
         <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"

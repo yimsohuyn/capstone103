@@ -14,6 +14,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.myapplication.databinding.FragmentHomeBinding
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -192,6 +193,21 @@ class HomeFragment : Fragment() {
     }
 
     private fun initCalendarUi() {
+        // CalendarView 색상 설정 (프로그래밍 방식)
+        binding.calendarView.apply {
+            // 선택된 날짜 배경색
+            selectedWeekBackgroundColor = ContextCompat.getColor(requireContext(), R.color.calendar_selected_date)
+            
+            // 포커스된 월의 날짜 색상
+            focusedMonthDateColor = ContextCompat.getColor(requireContext(), R.color.calendar_text)
+            
+            // 비포커스 월의 날짜 색상 (주말/다른 달)
+            unfocusedMonthDateColor = ContextCompat.getColor(requireContext(), R.color.calendar_weekend)
+            
+            // 주 구분선 색상
+            weekSeparatorLineColor = ContextCompat.getColor(requireContext(), R.color.divider)
+        }
+        
         // 처음 선택 날짜
         selectedDateMillis = binding.calendarView.date
 
@@ -332,7 +348,7 @@ class HomeFragment : Fragment() {
             b.calendarEventsContainer.addView(
                 TextView(requireContext()).apply {
                     text = "선택한 날짜에 일정이 없습니다."
-                    setTextColor(Color.DKGRAY)
+                    setTextColor(ContextCompat.getColor(requireContext(), R.color.text_secondary))
                 }
             )
             return
@@ -357,7 +373,7 @@ class HomeFragment : Fragment() {
             )
             text = formatEventTime(event)
             setTypeface(null, Typeface.BOLD)
-            setTextColor(Color.BLACK)
+            setTextColor(ContextCompat.getColor(requireContext(), R.color.text_primary))
         }
 
         val titleView = TextView(requireContext()).apply {
@@ -367,7 +383,7 @@ class HomeFragment : Fragment() {
                 0.7f
             )
             text = event.summary ?: "제목 없음"
-            setTextColor(Color.BLACK)
+            setTextColor(ContextCompat.getColor(requireContext(), R.color.text_primary))
         }
 
         container.addView(timeView)
@@ -467,7 +483,7 @@ class HomeFragment : Fragment() {
             b.calendarEventsContainer.addView(
                 TextView(requireContext()).apply {
                     text = "선택한 날짜에 일정이 없습니다."
-                    setTextColor(Color.DKGRAY)
+                    setTextColor(ContextCompat.getColor(requireContext(), R.color.text_secondary))
                 }
             )
             return
@@ -482,7 +498,7 @@ class HomeFragment : Fragment() {
             row.addView(TextView(requireContext()).apply {
                 text = schedule.time
                 setTypeface(null, Typeface.BOLD)
-                setTextColor(Color.BLACK)
+                setTextColor(ContextCompat.getColor(requireContext(), R.color.text_primary))
                 layoutParams = LinearLayout.LayoutParams(
                     0,
                     LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -492,7 +508,7 @@ class HomeFragment : Fragment() {
 
             row.addView(TextView(requireContext()).apply {
                 text = schedule.title
-                setTextColor(Color.BLACK)
+                setTextColor(ContextCompat.getColor(requireContext(), R.color.text_primary))
                 layoutParams = LinearLayout.LayoutParams(
                     0,
                     LinearLayout.LayoutParams.WRAP_CONTENT,

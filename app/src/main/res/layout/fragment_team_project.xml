@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
-    android:background="#F5F6FA">
+    android:background="@color/background_secondary">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -18,7 +18,7 @@
             android:text="팀원"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:textColor="#000000"
+            android:textColor="@color/text_primary"
             android:layout_marginBottom="8dp" />
 
         <LinearLayout
@@ -35,7 +35,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="팀원 이름을 추가해 주세요."
-                android:textColor="#666666"
+                android:textColor="@color/icon_secondary"
                 android:textSize="14sp" />
 
             <Button
@@ -50,7 +50,7 @@
                 android:layout_height="wrap_content"
                 android:text="팀원 초대"
                 android:padding="10dp"
-                android:textColor="@android:color/white" />
+                android:textColor="@color/icon_white" />
 
         </LinearLayout>
 
@@ -59,7 +59,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="@android:color/white"
+            android:background="@color/background_primary"
             android:padding="12dp"
             android:elevation="2dp">
 
@@ -68,7 +68,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="등록된 팀원이 없습니다."
-                android:textColor="#999999"
+                android:textColor="@color/text_hint"
                 android:textSize="13sp" />
         </LinearLayout>
 
@@ -76,7 +76,7 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="#DDDDDD"
+            android:background="@color/divider"
             android:layout_marginTop="20dp"
             android:layout_marginBottom="16dp" />
 
@@ -87,7 +87,7 @@
             android:text="진행률"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:textColor="#000000"
+            android:textColor="@color/text_primary"
             android:layout_marginBottom="8dp" />
 
         <TextView
@@ -95,7 +95,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="진행률: 0% (0/5)"
-            android:textColor="#555555"
+            android:textColor="@color/text_secondary"
             android:textSize="14sp"
             android:layout_marginBottom="8dp" />
 
@@ -106,7 +106,7 @@
             style="?android:attr/progressBarStyleHorizontal"
             android:max="100"
             android:progress="0"
-            android:progressTint="#3A82F7"
+            android:progressTint="@color/accent_blue"
             android:layout_marginBottom="8dp" />
 
         <LinearLayout
@@ -114,7 +114,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="@android:color/white"
+            android:background="@color/background_primary"
             android:padding="12dp"
             android:elevation="2dp">
 
@@ -153,7 +153,7 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="#DDDDDD"
+            android:background="@color/divider"
             android:layout_marginTop="20dp"
             android:layout_marginBottom="16dp" />
 
@@ -164,7 +164,7 @@
             android:text="팀 회의"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:textColor="#000000"
+            android:textColor="@color/text_primary"
             android:layout_marginBottom="8dp" />
 
         <Button
@@ -179,7 +179,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="@android:color/white"
+            android:background="@color/background_primary"
             android:padding="12dp"
             android:elevation="2dp">
 
@@ -188,7 +188,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="등록된 회의 일정이 없습니다."
-                android:textColor="#999999"
+                android:textColor="@color/text_hint"
                 android:textSize="13sp" />
         </LinearLayout>
 
@@ -196,7 +196,7 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="#DDDDDD"
+            android:background="@color/divider"
             android:layout_marginTop="20dp"
             android:layout_marginBottom="16dp" />
 
@@ -207,7 +207,7 @@
             android:text="프로젝트 파일"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:textColor="#000000"
+            android:textColor="@color/text_primary"
             android:layout_marginBottom="8dp" />
 
         <Button
@@ -222,7 +222,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="@android:color/white"
+            android:background="@color/background_primary"
             android:padding="12dp"
             android:elevation="2dp">
 
@@ -231,7 +231,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="등록된 파일이 없습니다."
-                android:textColor="#999999"
+                android:textColor="@color/text_hint"
                 android:textSize="13sp" />
         </LinearLayout>
 

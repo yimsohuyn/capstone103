@@ -4,14 +4,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF">
+    android:background="@color/background_primary">
 
     <!-- 상단바 -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/settingTopBar"
         android:layout_width="0dp"
         android:layout_height="60dp"
-        android:background="#FFFFFF"
+        android:background="@color/background_primary"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -24,7 +24,7 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_back"
             android:contentDescription="뒤로가기"
-            app:tint="@android:color/black"
+            app:tint="@color/icon_primary"
             android:clickable="true"
             android:focusable="true"
             app:layout_constraintStart_toStartOf="parent"
@@ -39,7 +39,7 @@
             android:text="AI필기요약"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:textColor="#000000"
+            android:textColor="@color/text_primary"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -67,7 +67,6 @@
             android:orientation="horizontal"
             android:paddingHorizontal="20dp"
             android:gravity="center_vertical"
-            android:background="#FFFFFF"
             android:clickable="true"
             android:focusable="true">
 
@@ -75,17 +74,18 @@
                 android:layout_width="30dp"
                 android:layout_height="33dp"
                 android:src="@drawable/outline_edit_note_24"
-                app:tint="#0A4D5E" />
+                app:tint="@color/accent_teal" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="AI 필기 요약"
+                android:textColor="@color/text_primary"
                 android:textSize="17sp"
                 android:layout_marginStart="12dp" />
         </LinearLayout>
 
-        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#DDDDDD" />
+        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/divider" />
 
         <!-- 메뉴 2 : 요약 파일 -->
         <LinearLayout
@@ -95,7 +95,6 @@
             android:orientation="horizontal"
             android:paddingHorizontal="20dp"
             android:gravity="center_vertical"
-            android:background="#FFFFFF"
             android:clickable="true"
             android:focusable="true">
 
@@ -103,17 +102,18 @@
                 android:layout_width="28dp"
                 android:layout_height="28dp"
                 android:src="@drawable/outline_files_24"
-                app:tint="#0A4D5E" />
+                app:tint="@color/accent_teal" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="요약 파일"
+                android:textColor="@color/text_primary"
                 android:textSize="17sp"
                 android:layout_marginStart="12dp" />
         </LinearLayout>
 
-        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#DDDDDD" />
+        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/divider" />
 
     </LinearLayout>
 

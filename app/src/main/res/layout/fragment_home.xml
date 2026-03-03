@@ -12,7 +12,7 @@
         android:id="@+id/topMenu"
         android:layout_width="0dp"
         android:layout_height="80dp"
-        android:background="#EBDCEB"
+        android:background="@color/background_home_gradient"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -22,9 +22,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Study With Me"
-            android:textColor="#000000"
             android:textSize="24sp"
             android:textStyle="bold"
+            android:textColor="@color/text_primary"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -37,6 +37,7 @@
             android:layout_height="24dp"
             android:layout_marginEnd="4dp"
             android:src="@drawable/ic_setting"
+            android:tint="@color/text_primary"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -48,6 +49,7 @@
             android:layout_height="24dp"
             android:layout_marginEnd="34dp"
             android:src="@drawable/ic_bell"
+            android:tint="@color/text_primary"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -59,6 +61,7 @@
             android:layout_height="24dp"
             android:layout_marginEnd="64dp"
             android:src="@drawable/ic_search"
+            android:tint="@color/text_primary"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -74,6 +77,12 @@
         android:id="@+id/calendarView"
         android:layout_width="0dp"
         android:layout_height="350dp"
+        android:background="@color/background"
+        android:theme="@style/CalendarViewStyle"
+        android:selectedWeekBackgroundColor="@color/calendar_selected_date"
+        android:focusedMonthDateColor="@color/calendar_text"
+        android:unfocusedMonthDateColor="@color/calendar_weekend"
+        android:weekSeparatorLineColor="@color/divider"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -96,8 +105,8 @@
             android:layout_height="wrap_content"
             android:paddingBottom="8dp"
             android:text="오늘 일정"
-            android:textColor="#000000"
             android:textSize="18sp"
+            android:textColor="@color/text_primary"
             android:textStyle="bold" />
 
 <!--        <Button-->
@@ -115,7 +124,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="구글 계정과 연결하면 일정이 자동으로 업데이트됩니다."
-            android:textColor="#FF5722"
+            android:textColor="@color/accent_red"
             android:paddingBottom="12dp" />
 
 
@@ -124,24 +133,24 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="상태 메시지 표시 영역"
-            android:textColor="#555555"
+            android:textColor="@color/text_primary"
             android:textSize="14sp"
             android:paddingBottom="8dp"
             android:paddingTop="8dp"/>
-
 
         <LinearLayout
             android:id="@+id/calendarEventsContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:textColor="@color/text_secondary">
 
             <TextView
                 android:id="@+id/emptyEventsText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="연동된 일정이 없습니다."
-                android:textColor="#757575" />
+                android:textColor="?attr/colorOnSurfaceVariant" />
         </LinearLayout>
     </LinearLayout>
 
@@ -152,12 +161,12 @@
         android:layout_height="wrap_content"
         android:src="@drawable/ic_add"
         android:contentDescription="Add Schedule"
-        app:tint="@android:color/white"
+        app:tint="@color/icon_white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="20dp"
-        app:backgroundTint="#9370DB"
+        app:backgroundTint="@color/point_assignment"
         app:maxImageSize="24dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

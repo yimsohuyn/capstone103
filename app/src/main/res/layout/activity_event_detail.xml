@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white">
+    android:background="@color/background_primary">
 
     <LinearLayout
         android:id="@+id/topBar"
@@ -24,7 +24,8 @@
             android:layout_height="32dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_back"
-            android:contentDescription="뒤로가기" />
+            android:contentDescription="뒤로가기"
+            android:textColor="@color/text_primary"/>
 
         <TextView
             android:id="@+id/tvTitle"
@@ -35,6 +36,7 @@
             android:text="제목"
             android:textSize="22sp"
             android:textStyle="bold"
+            android:textColor="@color/text_primary"
             android:singleLine="true"
             android:ellipsize="end" />
 
@@ -84,6 +86,7 @@
                         android:layout_width="20dp"
                         android:layout_height="20dp"
                         android:src="@drawable/ic_search"
+                        android:tint="@color/onPrimary"
                         android:contentDescription="시간" />
 
                     <TextView
@@ -198,6 +201,7 @@
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:src="@drawable/ic_setting"
+                    android:tint="@color/onPrimary"
                     android:contentDescription="캘린더" />
 
                 <TextView
@@ -217,7 +221,7 @@
         android:layout_width="0dp"
         android:layout_height="72dp"
         android:orientation="horizontal"
-        android:background="#FAFAFA"
+        android:background="@color/background_card"
         android:gravity="center"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -236,12 +240,14 @@
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:src="@drawable/ic_search" />
+                android:src="@drawable/ic_search"
+                android:textColor="@color/text_primary"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="복사"
+                android:textColor="@color/text_primary"
                 android:textSize="12sp" />
         </LinearLayout>
 
@@ -258,12 +264,14 @@
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:src="@drawable/ic_add" />
+                android:src="@drawable/ic_add"
+                android:textColor="@color/text_primary"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="편집"
+                android:textColor="@color/text_primary"
                 android:textSize="12sp" />
         </LinearLayout>
 
@@ -280,12 +288,14 @@
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:src="@drawable/ic_bell" />
+                android:src="@drawable/ic_bell"
+                android:textColor="@color/text_primary"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="공유"
+                android:textColor="@color/text_primary"
                 android:textSize="12sp" />
         </LinearLayout>
 
@@ -302,12 +312,14 @@
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:src="@drawable/baseline_delete_24" />
+                android:src="@drawable/baseline_delete_24"
+                android:textColor="@color/text_primary"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="삭제"
+                android:textColor="@color/text_primary"
                 android:textSize="12sp" />
         </LinearLayout>
 

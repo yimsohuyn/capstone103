@@ -11,6 +11,7 @@
 
 
     <application
+        android:name=".MyApplication"
         android:allowBackup="true"
         android:supportsRtl="true"
         android:theme="@style/Theme.MyApplication"
@@ -24,8 +25,7 @@
         <activity android:name=".RegisterActivity" />
         <activity android:name=".SettingAccount" />
 
-        <!-- ✅
- 스플래시 화면: 앱 실행 시 가장 먼저 뜨는 액티비티 -->
+        <!--  스플래시 : 앱 실행 시 가장 먼저 뜨는 액티비티 -->
         <activity
             android:name=".SplashActivity"
             android:exported="true"
@@ -41,10 +41,10 @@
             android:name=".LoginActivity"
             android:exported="true"
             android:theme="@style/Theme.Material3.DayNight.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
+<!--            <intent-filter>-->
+<!--                <action android:name="android.intent.action.MAIN"/>-->
+<!--                <category android:name="android.intent.category.LAUNCHER"/>-->
+<!--            </intent-filter>-->
         </activity>
 
         <!-- 기존 메인 화면 -->

@@ -11,11 +11,13 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import com.google.android.material.switchmaterial.SwitchMaterial
 
 class SettingActivity : AppCompatActivity() {
 
@@ -105,6 +107,32 @@ class SettingActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_setting)
+
+        val switchDarkMode = findViewById<SwitchMaterial>(R.id.switchDarkMode)
+        val prefs = getSharedPreferences("theme", MODE_PRIVATE)
+        val isDark = prefs.getBoolean("dark", false)
+        switchDarkMode.isChecked = isDark
+        switchDarkMode.setOnCheckedChangeListener { _, isChecked ->
+
+            prefs.edit()
+                .putBoolean("dark", isChecked)
+                .apply()
+
+            AppCompatDelegate.setDefaultNightMode(
+                if (isChecked)
+                    AppCompatDelegate.MODE_NIGHT_YES
+                else
+                    AppCompatDelegate.MODE_NIGHT_NO
+            )
+        }
+
+        val row = findViewById<View>(R.id.settingInfo1)
+        val switch = findViewById<SwitchMaterial>(R.id.switchDarkMode)
+
+        row.setOnClickListener {
+            switch.isChecked = !switch.isChecked
+        }
+
 
         initViews()
         setupGoogleSignIn()

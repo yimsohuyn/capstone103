@@ -140,12 +140,22 @@ class ScheduleBottomSheetFragment : BottomSheetDialogFragment() {
             tvStartDateValue.text = formatDate(startYear, startMonth, startDay)
             tvEndDateValue.text = formatDate(endYear, endMonth, endDay)
 
+            // 테마 인식 색상 사용
+            val selectedColor = androidx.core.content.ContextCompat.getColor(
+                requireContext(), 
+                R.color.onPrimary
+            )
+            val unselectedColor = androidx.core.content.ContextCompat.getColor(
+                requireContext(), 
+                R.color.text_secondary
+            )
+            
             if (selectingStart) {
-                tvStartDateValue.setTextColor(0xFF673AB7.toInt()) // 보라색
-                tvEndDateValue.setTextColor(0xFF808080.toInt())   // 회색
+                tvStartDateValue.setTextColor(selectedColor)
+                tvEndDateValue.setTextColor(unselectedColor)
             } else {
-                tvStartDateValue.setTextColor(0xFF808080.toInt())
-                tvEndDateValue.setTextColor(0xFF673AB7.toInt())
+                tvStartDateValue.setTextColor(unselectedColor)
+                tvEndDateValue.setTextColor(selectedColor)
             }
         }
 

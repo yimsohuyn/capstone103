@@ -7,4 +7,79 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="point_blue">#0026FF</color>
+
+    <color name="point_assignment">#656FCA</color>
+    <color name="primary">#373737</color>
+    <color name="onPrimary">#000000</color>
+    <color name="secondary">#555555</color>
+    <color name="onSecondary">#555555</color>
+    <color name="background">#FFFFFF</color>
+    <color name="onBackground">#000000</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="onSurface">#FF000000</color>
+
+    <!-- nav-->
+    <color name="nav_select">#2962FF</color>
+    <color name="nav">#808080</color>
+
+    <!-- setting switch-->
+    <color name="switch_thumb_on">#6F6F6F</color>
+    <color name="switch_track_on">#B4B4B4</color>
+
+    <color name="switch_thumb_off">#1B1B1B</color>
+    <color name="switch_track_off">#565656</color>
+
+    <!-- alert dialog-->
+    <color name="dialog_button">#4E4E4E</color>
+    <color name="dialog_background">#F8F8F8</color>
+
+    <!-- tap mode-->
+    <color name="tab_text_normal">#383838</color>
+    <color name="tab_text_selected">#000000</color>
+    <color name="tab_indicator">#383838</color>
+
+    <!-- Text Colors -->
+    <color name="text_primary">#000000</color>
+    <color name="text_secondary">#555555</color>
+    <color name="text_tertiary">#757575</color>
+    <color name="text_hint">#999999</color>
+    <color name="text_disabled">#BDBDBD</color>
+
+    <!-- Background Colors -->
+    <color name="background_primary">#FFFFFF</color>
+    <color name="background_secondary">#F5F6FA</color>
+    <color name="background_card">#F7F7F7</color>
+    <color name="background_box">#F1F1F5</color>
+    <color name="background_dialog">#EEEEEE</color>
+    <color name="background_home_gradient">#D2D8EF</color>
+
+    <!-- UI Elements -->
+    <color name="divider">#FFFFFF</color>
+    <color name="divider_light">#DDDDDD</color>
+    <color name="underline">#BDBDBD</color>
+
+    <!-- Icon Colors -->
+    <color name="icon_primary">#000000</color>
+    <color name="icon_secondary">#666666</color>
+    <color name="icon_white">#FFFFFF</color>
+
+    <!-- Accent Colors -->
+    <color name="accent_teal">#0A4D5E</color>
+    <color name="accent_purple">#9370DB</color>
+    <color name="accent_blue">#5893F4</color>
+    <color name="accent_alarm">#3C488B</color>
+    <color name="accent_red">#FF5722</color>
+    <color name="accent_red_dark">#FF3B30</color>
+
+    <!-- Calendar specific colors -->
+    <color name="calendar_selected_date">#5893F4</color>  <!-- accent_blue 사용 -->
+    <color name="calendar_today">#FF5722</color>          <!-- accent_red 사용 -->
+    <color name="calendar_text">#000000</color>
+    <color name="calendar_weekend">#757575</color>
+
+    <!-- Status Colors -->
+    <color name="text_error">#FF3B30</color>
+    <color name="text_dialog">#333333</color>
+
 </resources>

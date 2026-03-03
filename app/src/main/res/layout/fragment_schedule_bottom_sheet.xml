@@ -4,7 +4,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+
     android:orientation="vertical"
+    android:background="@color/background_primary"
     android:padding="16dp">
 
     <!-- 상단 바(뒤로가기 + 제목) -->
@@ -20,7 +22,7 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_back"
             android:contentDescription="뒤로가기"
-            app:tint="@android:color/black"
+            app:tint="@color/icon_primary"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" />
@@ -32,6 +34,7 @@
             android:text="새 일정 추가"
             android:textSize="20sp"
             android:textStyle="bold"
+            android:textColor="@color/text_primary"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -41,8 +44,9 @@
     <!-- 내용 영역: 스크롤 가능 -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_weight="1"
+        android:layout_gravity="center_vertical"
         android:fillViewport="true">
 
         <LinearLayout
@@ -97,6 +101,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="----"
+                        android:textColor="@color/onPrimary"
                         android:textStyle="bold"
                         android:textSize="15sp"/>
                 </LinearLayout>
@@ -121,6 +126,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="----"
+                        android:textColor="@color/onPrimary"
                         android:textStyle="bold"
                         android:textSize="15sp"/>
                 </LinearLayout>
@@ -131,6 +137,9 @@
                 android:id="@+id/datePicker"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_gravity=""
+                android:background="@color/background"
+                android:theme="@style/DatePickerStyle"
                 android:calendarViewShown="true"
                 android:spinnersShown="false" />
 
@@ -201,7 +210,7 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="#BDBDBD" />
+                    android:background="@color/underline" />
             </LinearLayout>
 
             <!-- 알림 헤더 -->
@@ -229,7 +238,7 @@
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="알림 켜기"
                     android:layout_marginStart="8dp"
-                    app:tint="@android:color/black" />
+                    app:tint="@color/icon_primary" />
             </LinearLayout>
 
             <!-- 알림 상세 -->
@@ -270,6 +279,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="저장"
-        android:layout_marginTop="10dp" />
+        android:layout_marginTop="10dp"
+        android:textColor="@color/onPrimary"/>
 
 </LinearLayout>

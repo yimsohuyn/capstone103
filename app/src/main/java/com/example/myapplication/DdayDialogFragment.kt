@@ -5,10 +5,12 @@ import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.api.client.util.DateTime
 import com.google.api.services.calendar.Calendar
 import com.google.api.services.calendar.model.Event
@@ -26,7 +28,7 @@ class DdayDialogFragment : DialogFragment() {
     private var tvTitle: TextView? = null
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val builder = AlertDialog.Builder(requireContext())
+        val builder = MaterialAlertDialogBuilder(requireContext())
         val inflater = requireActivity().layoutInflater
         val view = inflater.inflate(R.layout.dday_dialog, null)  // xml 이름 확인
 
@@ -47,8 +49,23 @@ class DdayDialogFragment : DialogFragment() {
         }
 
         builder.setView(view)
-        builder.setNegativeButton("닫기", null)
-        return builder.create()
+        builder.setNegativeButton("닫기") { dialog, _ ->
+            dialog.dismiss()
+        }
+        
+        val dialog = builder.create()
+        
+        // 다이얼로그 window 배경색 설정
+        dialog.window?.setBackgroundDrawableResource(R.color.dialog_background)
+        
+        // 다이얼로그가 생성된 후 버튼 색상 설정
+        dialog.setOnShowListener {
+            dialog.getButton(AlertDialog.BUTTON_NEGATIVE)?.apply {
+                setTextColor(ContextCompat.getColor(requireContext(), R.color.onSecondary))
+            }
+        }
+        
+        return dialog
     }
 
     //HomeFragment 에서 디테일 화면 다녀온 후 호출/ 팝업 리스트를 다시 채우는 함수

@@ -5,7 +5,8 @@
     android:paddingVertical="8dp"
     android:paddingHorizontal="4dp"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="@color/dialog_background">
 
     <TextView
         android:id="@+id/tvTitle"

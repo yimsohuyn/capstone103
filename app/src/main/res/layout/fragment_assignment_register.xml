@@ -4,14 +4,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="20dp"
-    android:background="#F5F6FA">
+    android:background="@color/background_secondary">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="20dp"
-        android:background="@android:color/white"
+        android:background="@color/background_primary"
         android:elevation="4dp"
         android:layout_marginTop="16dp"
         android:layout_marginBottom="16dp"
@@ -33,7 +33,7 @@
                 android:layout_height="24dp"
                 android:background="@android:color/transparent"
                 android:src="@drawable/ic_back"
-                app:tint="@android:color/black"
+                app:tint="@color/icon_primary"
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
                 android:contentDescription="뒤로가기" />
@@ -44,7 +44,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="과제 등록"
-                android:textColor="#000000"
+                android:textColor="@color/text_primary"
                 android:textSize="22sp"
                 android:textStyle="bold"
                 android:layout_centerInParent="true" />
@@ -80,7 +80,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="마감일"
-            android:textColor="#555555"
+            android:textColor="@color/text_secondary"
             android:textSize="14sp"
             android:layout_marginTop="16dp" />
 
@@ -99,12 +99,13 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="마감일 선택"
-                android:textColor="#000000" />
+                android:textColor="@color/text_primary" />
 
             <ImageView
                 android:layout_width="22dp"
                 android:layout_height="22dp"
-                android:src="@drawable/ic_calendar" />
+                android:src="@drawable/ic_calendar"
+                android:tint="@color/text_primary"/>
         </LinearLayout>
 
         <!-- 담당자 -->
@@ -112,7 +113,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="담당자 (선택)"
-            android:textColor="#555555"
+            android:textColor="@color/text_secondary"
             android:textSize="14sp"
             android:layout_marginTop="16dp" />
 
@@ -137,7 +138,7 @@
                 android:layout_weight="1"
                 android:layout_marginStart="10dp"
                 android:text="담당자 선택"
-                android:textColor="#000000" />
+                android:textColor="@color/text_primary" />
         </LinearLayout>
 
         <!-- 파일 첨부 -->
@@ -152,14 +153,15 @@
             <ImageView
                 android:layout_width="20dp"
                 android:layout_height="20dp"
-                android:src="@drawable/ic_attach" />
+                android:src="@drawable/ic_attach"
+                android:tint="@color/text_primary"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:text="파일 첨부"
-                android:textColor="#000000" />
+                android:textColor="@color/text_primary" />
         </LinearLayout>
 
         <!-- 과제 유형 -->
@@ -167,7 +169,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="과제 유형"
-            android:textColor="#555555"
+            android:textColor="@color/text_secondary"
             android:textSize="14sp"
             android:layout_marginTop="20dp" />
 
@@ -185,8 +187,8 @@
             android:text="등록"
             android:textSize="16sp"
             android:layout_marginTop="24dp"
-            android:textColor="@android:color/white"
-            android:backgroundTint="#9370DB" />
+            android:textColor="@color/icon_white"
+            android:backgroundTint="@color/point_assignment" />
 
     </LinearLayout>
 

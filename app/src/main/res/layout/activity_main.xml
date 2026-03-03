@@ -5,7 +5,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
     tools:context=".MainActivity">
 
     <!-- 모든 Fragment를 띄우는 NavHostFragment -->
@@ -26,10 +25,9 @@
         android:id="@+id/bottomNav"
         android:layout_width="0dp"
         android:layout_height="60dp"
-        android:background="@android:color/white"
         android:elevation="10dp"
 
-        app:itemBackground="@android:color/transparent"
+        app:itemBackground="@color/background_primary"
         app:itemRippleColor="@android:color/transparent"
         app:itemActiveIndicatorStyle="@android:color/transparent"
 

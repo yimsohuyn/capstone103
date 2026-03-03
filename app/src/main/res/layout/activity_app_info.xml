@@ -5,7 +5,7 @@
     android:padding="16dp"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF">
+    android:background="@color/background_primary">
 
     <!-- 상단바 -->
     <LinearLayout
@@ -20,6 +20,7 @@
             android:layout_height="45dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_back"
+            android:tint="@color/text_primary"
             android:contentDescription="뒤로가기" />
 
         <TextView

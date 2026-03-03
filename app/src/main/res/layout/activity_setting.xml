@@ -3,15 +3,13 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#FFFFFF">
+    android:layout_height="match_parent">
 
     <!-- 상단바 -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/settingTopBar"
         android:layout_width="0dp"
         android:layout_height="60dp"
-        android:background="#FFFFFF"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -24,7 +22,7 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_back"
             android:contentDescription="뒤로가기"
-            app:tint="@android:color/black"
+            app:tint="@color/icon_primary"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" />
@@ -37,7 +35,7 @@
             android:text="설정"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:textColor="#000000"
+            android:textColor="@color/text_primary"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -65,7 +63,7 @@
             android:layout_width="70dp"
             android:layout_height="70dp"
             android:src="@drawable/ic_user"
-            android:tint="#000000"
+            android:tint="@color/icon_primary"
             android:layout_gravity="center_vertical" />
 
         <!-- 구글 아이디 텍스트 -->
@@ -82,12 +80,12 @@
                 android:layout_height="wrap_content"
                 android:text="아이디"
                 android:textSize="16sp"
-                android:textColor="#000000" />
+                android:textColor="@color/text_primary" />
 
             <View
                 android:layout_width="180dp"
                 android:layout_height="1dp"
-                android:background="#BDBDBD"
+                android:background="@color/underline"
                 android:layout_marginTop="4dp" />
         </LinearLayout>
 
@@ -112,25 +110,38 @@
             android:orientation="horizontal"
             android:paddingHorizontal="20dp"
             android:gravity="center_vertical"
-            android:background="#FFFFFF"
+            android:background="@color/background_primary"
             android:clickable="true"
-            android:focusable="true">
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground">
+            >
 
             <ImageView
                 android:layout_width="22dp"
                 android:layout_height="22dp"
                 android:src="@drawable/ic_moon"
-                android:tint="#0A4D5E" />
+                android:tint="@color/accent_teal" />
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="다크모드 (개발중)"
+                android:layout_weight="1"
+                android:text="다크모드"
+                android:textColor="@color/text_primary"
                 android:textSize="17sp"
                 android:layout_marginStart="12dp" />
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/switchDarkMode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:useMaterialThemeColors="false"
+                app:thumbTint="@color/switch_thumb"
+                app:trackTint="@color/switch_track"/>
+
         </LinearLayout>
 
-        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#DDDDDD" />
+        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/divider" />
 
         <!-- 메뉴 2 : 정보 -->
         <LinearLayout
@@ -140,7 +151,7 @@
             android:orientation="horizontal"
             android:paddingHorizontal="20dp"
             android:gravity="center_vertical"
-            android:background="#FFFFFF"
+            android:background="@color/background_primary"
             android:clickable="true"
             android:focusable="true">
 
@@ -149,17 +160,18 @@
                 android:layout_height="22dp"
                 android:src="@drawable/ic_info"
                 android:layout_marginTop="3dp"
-                android:tint="#000000" />
+                android:tint="@color/icon_primary" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="정보"
+                android:textColor="@color/text_primary"
                 android:textSize="17sp"
                 android:layout_marginStart="12dp" />
         </LinearLayout>
 
-        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#DDDDDD" />
+        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/divider" />
 
         <!-- 로그아웃 -->
         <LinearLayout
@@ -169,7 +181,7 @@
             android:orientation="horizontal"
             android:paddingHorizontal="20dp"
             android:gravity="center_vertical"
-            android:background="#FFFFFF"
+            android:background="@color/background_primary"
             android:clickable="true"
             android:focusable="true">
 
@@ -178,10 +190,10 @@
                 android:layout_height="wrap_content"
                 android:text="로그아웃"
                 android:textSize="17sp"
-                android:textColor="#FF3B30" />
+                android:textColor="@color/accent_red_dark" />
         </LinearLayout>
 
-        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#DDDDDD" />
+        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/divider" />
 
     </LinearLayout>
 

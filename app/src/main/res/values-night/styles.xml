@@ -3,7 +3,7 @@
 
     <!-- 기본 앱 테마 -->
     <style name="Theme.AndroidTest" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="colorPrimary">@color/point_blue</item>
+        <item name="colorPrimary">@color/purple_500</item>
         <item name="colorSecondary">@color/teal_200</item>
     </style>
 
@@ -12,7 +12,7 @@
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">14sp</item>
 
-        <!-- 🔼 글씨를 위로 올려주는 핵심! -->
+        <!-- 글씨 위로 -->
         <item name="android:paddingTop">-6dp</item>
     </style>
 
@@ -21,7 +21,7 @@
         <item name="android:textStyle">normal</item>
         <item name="android:textSize">14sp</item>
 
-        <!-- 🔼 비선택 글씨도 동일하게 위로 올림 -->
+        <!-- 비선택 글씨도 동일하게 위로 -->
         <item name="android:paddingTop">-6dp</item>
     </style>
 
@@ -49,20 +49,19 @@
         <item name="android:textColor">@color/onSecondary</item>
     </style>
 
-    <!-- CalendarView 커스텀 스타일 -->
+    <!-- CalendarView 커스텀 스타일 (Dark mode) -->
     <style name="CalendarViewStyle">
         <item name="android:textColor">@color/calendar_text</item>
         <item name="android:textColorPrimary">@color/calendar_text</item>
         <item name="android:colorControlActivated">@color/calendar_selected_date</item>
     </style>
 
-    <!-- DatePicker 커스텀 스타일 -->
+    <!-- DatePicker 커스텀 스타일 (Dark mode) -->
     <style name="DatePickerStyle">
         <item name="android:textColor">@color/text_primary</item>
         <item name="android:textColorPrimary">@color/text_primary</item>
         <item name="android:colorControlActivated">@color/accent_blue</item>
         <item name="colorAccent">@color/accent_blue</item>
     </style>
-
 
 </resources>
