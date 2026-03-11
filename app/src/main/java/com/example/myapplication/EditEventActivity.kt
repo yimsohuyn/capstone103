@@ -54,8 +54,8 @@ class EditEventActivity : AppCompatActivity() {
         val editEndTime = findViewById<EditText>(R.id.editEndTime)
         val etDetail = findViewById<EditText>(R.id.etDetail)
 
-        val switchAllDay = findViewById<Switch>(R.id.switchAllDay)
-        val switchAlarm = findViewById<Switch>(R.id.switchAlarm)
+        val switchAllDay = findViewById<com.google.android.material.switchmaterial.SwitchMaterial>(R.id.switchAllDay)
+        val switchAlarm = findViewById<com.google.android.material.switchmaterial.SwitchMaterial>(R.id.switchAlarm)
         val rowAlarmTime = findViewById<LinearLayout>(R.id.rowAlarmTime)
         val editAlarmTime = findViewById<EditText>(R.id.editAlarmTime)
 
@@ -149,6 +149,7 @@ class EditEventActivity : AppCompatActivity() {
 
             DatePickerDialog(
                 this,
+                R.style.CustomDatePickerDialogTheme, // 팝업으로 지원하는 테마 사용
                 listener,
                 cal.get(Calendar.YEAR),
                 cal.get(Calendar.MONTH),

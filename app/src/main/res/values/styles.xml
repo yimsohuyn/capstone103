@@ -64,5 +64,23 @@
         <item name="colorAccent">@color/accent_blue</item>
     </style>
 
+    <!-- DatePickerDialog 팝업용 커스텀 테마 -->
+    <style name="CustomDatePickerDialogTheme" parent="Theme.Material3.DayNight.Dialog">
+        <item name="colorPrimary">@color/accent_blue</item>
+        <item name="colorAccent">@color/accent_blue</item>
+        <item name="colorSurface">@color/dialog_background</item>
+    </style>
+
+    <!-- 커스텀 스위치 테마 (기본 색상 고정용) -->
+    <style name="CustomSwitchTheme" parent="ThemeOverlay.Material3.Light">
+        <item name="colorControlActivated">@color/switch_thumb</item>
+        <item name="colorSecondary">@color/switch_thumb</item>
+    </style>
+
+    <!-- 커스텀 스위치 테마 (파란색 포인트용 - 일정 편집 등) -->
+    <style name="CustomSwitchThemeBlue" parent="ThemeOverlay.Material3.Light">
+        <item name="colorControlActivated">@color/accent_blue</item>
+        <item name="colorSecondary">@color/accent_blue</item>
+    </style>
 
 </resources>

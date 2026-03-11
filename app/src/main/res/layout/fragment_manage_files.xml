@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@color/background_primary"
+    android:padding="16dp"
+    android:minHeight="300dp">
+
+    <!-- 상단: 제목 + 닫기 버튼 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingBottom="12dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="저장된 파일 관리"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/text_primary" />
+
+        <ImageButton
+            android:id="@+id/btnCloseManageFiles"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            android:contentDescription="닫기" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider" />
+
+    <!-- 파일이 없을 때 안내 텍스트 -->
+    <TextView
+        android:id="@+id/tvEmptyFiles"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="저장된 파일이 없습니다."
+        android:textColor="@color/text_secondary"
+        android:textSize="15sp"
+        android:gravity="center"
+        android:paddingTop="40dp"
+        android:visibility="gone" />
+
+    <!-- 파일 목록 -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvManagedFiles"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp" />
+
+</LinearLayout>

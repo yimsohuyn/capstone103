@@ -88,10 +88,13 @@
                     android:textColor="@color/text_primary"
             android:textSize="16sp" />
 
-                <Switch
+                <com.google.android.material.switchmaterial.SwitchMaterial
                     android:id="@+id/switchAllDay"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    app:useMaterialThemeColors="false"
+                    app:thumbTint="@color/switch_thumb"
+                    app:trackTint="@color/switch_track" />
             </LinearLayout>
 
             <!-- 시작 날짜 / 시간 -->
@@ -231,10 +234,13 @@
                     android:text="알림"
                     android:textSize="16sp" />
 
-                <Switch
+                <com.google.android.material.switchmaterial.SwitchMaterial
                     android:id="@+id/switchAlarm"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    app:thumbTint="@color/switch_thumb"
+                    app:trackTint="@color/switch_track" />
+<!--                    android:theme="@style/CustomSwitchThemeBlue" />-->
             </LinearLayout>
 
             <!-- 알림 시간 -->
