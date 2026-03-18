@@ -37,14 +37,14 @@
         <DatePicker
             android:id="@+id/dpStartDate"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:theme="@style/DatePickerStyle" />
+        android:layout_height="wrap_content"
+        android:theme="@style/DatePickerStyle" />
 
         <TimePicker
             android:id="@+id/tpStartTime"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:theme="@style/DatePickerStyle" />
+        android:layout_height="wrap_content"
+        android:theme="@style/DatePickerStyle" />
 
         <View
             android:layout_width="match_parent"
@@ -60,14 +60,14 @@
         <DatePicker
             android:id="@+id/dpEndDate"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:theme="@style/DatePickerStyle" />
+        android:layout_height="wrap_content"
+        android:theme="@style/DatePickerStyle" />
 
         <TimePicker
             android:id="@+id/tpEndTime"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:theme="@style/DatePickerStyle" />
+        android:layout_height="wrap_content"
+        android:theme="@style/DatePickerStyle" />
 
     </LinearLayout>
 </ScrollView>

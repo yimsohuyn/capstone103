@@ -46,7 +46,6 @@ android {
         buildConfigField("String", "GEMINI_API_KEY", "\"${localProperties.getProperty("GEMINI_API_KEY", "")}\"")
     }
 
-
     buildTypes {
         release {
             isMinifyEnabled = false

@@ -12,7 +12,7 @@ import androidx.room.RoomDatabase
         ProjectFileEntity::class,
         AssignmentEntity::class
     ],
-    version = 3,
+    version = 6,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

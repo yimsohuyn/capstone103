@@ -86,7 +86,7 @@
                     android:layout_weight="1"
                     android:text="하루 종일"
                     android:textColor="@color/text_primary"
-            android:textSize="16sp" />
+                    android:textSize="16sp" />
 
                 <com.google.android.material.switchmaterial.SwitchMaterial
                     android:id="@+id/switchAllDay"
@@ -112,7 +112,7 @@
                     android:layout_height="wrap_content"
                     android:text="시작"
                     android:textColor="@color/text_primary"
-            android:textSize="16sp" />
+                    android:textSize="16sp" />
 
                 <!-- 🔹 날짜 : 클릭해서 DatePicker 띄우는 용도 -->
                 <TextView
@@ -137,7 +137,7 @@
                     android:inputType="number"
                     android:maxLength="5"
                     android:textColor="@color/text_primary"
-            android:textSize="16sp" />
+                    android:textSize="16sp" />
             </LinearLayout>
 
             <!-- 종료 날짜 / 시간 -->
@@ -155,7 +155,7 @@
                     android:layout_height="wrap_content"
                     android:text="종료"
                     android:textColor="@color/text_primary"
-            android:textSize="16sp" />
+                    android:textSize="16sp" />
 
                 <!-- 🔹 날짜 : 클릭해서 DatePicker 띄우는 용도 -->
                 <TextView
@@ -180,7 +180,7 @@
                     android:inputType="number"
                     android:maxLength="5"
                     android:textColor="@color/text_primary"
-            android:textSize="16sp" />
+                    android:textSize="16sp" />
             </LinearLayout>
 
             <!-- 상세 내용 -->
@@ -240,7 +240,7 @@
                     android:layout_height="wrap_content"
                     app:thumbTint="@color/switch_thumb"
                     app:trackTint="@color/switch_track" />
-<!--                    android:theme="@style/CustomSwitchThemeBlue" />-->
+                <!--                    android:theme="@style/CustomSwitchThemeBlue" />-->
             </LinearLayout>
 
             <!-- 알림 시간 -->

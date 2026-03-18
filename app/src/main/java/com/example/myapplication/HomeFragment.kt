@@ -3,7 +3,6 @@ package com.example.myapplication
 import android.app.Activity
 import android.app.Activity.RESULT_OK
 import android.content.Intent
-import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -13,9 +12,11 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.fragment.app.Fragment
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import com.example.myapplication.data.AppDatabase
+import com.example.myapplication.data.AssignmentEntity
 import com.example.myapplication.databinding.FragmentHomeBinding
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
@@ -48,6 +49,8 @@ data class Schedule(
 
 class HomeFragment : Fragment() {
 
+    private val koreaTimeZone = java.util.TimeZone.getTimeZone("Asia/Seoul")
+
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
@@ -58,7 +61,9 @@ class HomeFragment : Fragment() {
 
     // 날짜 + 시간 포맷
     private var selectedDateMillis: Long = System.currentTimeMillis()
-    private val timeFormatter = SimpleDateFormat("HH:mm", Locale.getDefault())
+    private val timeFormatter = SimpleDateFormat("HH:mm", Locale.getDefault()).apply {
+        timeZone = java.util.TimeZone.getTimeZone("Asia/Seoul")
+    }
 
     // 앱 내부에서 관리하는 로컬 일정 (구글 계정 X 일 때만 사용)
     private val schedulesByDate = mutableMapOf<Long, MutableList<Schedule>>()
@@ -196,18 +201,22 @@ class HomeFragment : Fragment() {
         // CalendarView 색상 설정 (프로그래밍 방식)
         binding.calendarView.apply {
             // 선택된 날짜 배경색
-            selectedWeekBackgroundColor = ContextCompat.getColor(requireContext(), R.color.calendar_selected_date)
-            
+            selectedWeekBackgroundColor =
+                ContextCompat.getColor(requireContext(), R.color.calendar_selected_date)
+
             // 포커스된 월의 날짜 색상
-            focusedMonthDateColor = ContextCompat.getColor(requireContext(), R.color.calendar_text)
-            
+            focusedMonthDateColor =
+                ContextCompat.getColor(requireContext(), R.color.calendar_text)
+
             // 비포커스 월의 날짜 색상 (주말/다른 달)
-            unfocusedMonthDateColor = ContextCompat.getColor(requireContext(), R.color.calendar_weekend)
-            
+            unfocusedMonthDateColor =
+                ContextCompat.getColor(requireContext(), R.color.calendar_weekend)
+
             // 주 구분선 색상
-            weekSeparatorLineColor = ContextCompat.getColor(requireContext(), R.color.divider)
+            weekSeparatorLineColor =
+                ContextCompat.getColor(requireContext(), R.color.divider)
         }
-        
+
         // 처음 선택 날짜
         selectedDateMillis = binding.calendarView.date
 
@@ -281,22 +290,35 @@ class HomeFragment : Fragment() {
         fetchEventsForSelectedDay()
     }
 
+    /**
+     * ✅ 수정됨:
+     * - 선택한 날짜의 "과제(Assignment)"를 Room DB에서 읽어옴
+     * - 구글 이벤트 + 과제를 같이 렌더링
+     * - 구글 계정이 없어도 과제는 표시됨
+     */
     private fun fetchEventsForSelectedDay() {
         val service = calendarService
-        if (service == null) {
-            renderSchedulesForDate(selectedDateMillis)
-            showStatus("구글 계정을 먼저 연결해주세요.")
-            return
-        }
-
         showStatus("일정을 불러오는 중입니다...")
 
         viewLifecycleOwner.lifecycleScope.launch {
             try {
+                // 1) 선택 날짜의 과제 먼저 로드
+                val assignments = withContext(Dispatchers.IO) {
+                    loadAssignmentsForSelectedDay()
+                }
+
+                // 2) 구글 계정이 없으면: 과제만 표시하고 종료
+                if (service == null) {
+                    renderGoogleEvents(emptyList(), assignments)
+                    showStatus("총 ${assignments.size}개의 일정이 있습니다.")
+                    return@launch
+                }
+
                 val (timeMin, timeMax) = withContext(Dispatchers.Default) {
                     selectedDayBounds(selectedDateMillis)
                 }
 
+                // 3) 선택 날짜의 구글 이벤트 로드
                 val items = withContext(Dispatchers.IO) {
                     service.events().list("primary")
                         .setSingleEvents(true)
@@ -309,8 +331,13 @@ class HomeFragment : Fragment() {
 
                 if (_binding == null) return@launch
 
-                renderGoogleEvents(items)
-                showStatus("총 ${items.size}개의 일정이 있습니다.")
+                val filteredEvents = items.filterNot { event ->
+                    val title = event.summary ?: ""
+                    title.startsWith("[팀 과제]") || title.startsWith("[개인 과제]")
+                }
+                // 4) 같이 렌더링
+                renderGoogleEvents(items, assignments)
+                showStatus("총 ${filteredEvents.size + assignments.size}개의 일정이 있습니다.")
             } catch (ex: Exception) {
                 when (ex) {
                     is UserRecoverableAuthIOException -> {
@@ -340,11 +367,22 @@ class HomeFragment : Fragment() {
 
     // -------------------- 구글 일정 UI --------------------
 
-    private fun renderGoogleEvents(events: List<Event>) {
+    /**
+     * ✅ 수정됨:
+     * - events(구글) + assignments(과제) 둘 다 받음
+     * - 과제를 먼저 띄우고, 그 다음 구글 이벤트 띄움
+     */
+    private fun renderGoogleEvents(events: List<Event>, assignments: List<AssignmentEntity>) {
         val b = _binding ?: return
         b.calendarEventsContainer.removeAllViews()
 
-        if (events.isEmpty()) {
+        // 과제로 동기화된 구글 이벤트는 숨김
+        val filteredEvents = events.filterNot { event ->
+            val title = event.summary ?: ""
+            title.startsWith("[팀 과제]") || title.startsWith("[개인 과제]")
+        }
+
+        if (filteredEvents.isEmpty() && assignments.isEmpty()) {
             b.calendarEventsContainer.addView(
                 TextView(requireContext()).apply {
                     text = "선택한 날짜에 일정이 없습니다."
@@ -354,9 +392,27 @@ class HomeFragment : Fragment() {
             return
         }
 
-        events.forEach { event ->
-            b.calendarEventsContainer.addView(createEventRow(event))
+        // ✅ 과제 + 일반 일정을 한 리스트로 합쳐서 시간순 정렬
+        val mergedItems = mutableListOf<Pair<Long, View>>()
+
+        assignments.forEach { assignment ->
+            val startMillis = assignmentDateTimeToMillis(
+                assignment.dueDate,
+                assignment.startTime ?: "09:00"
+            )
+            mergedItems.add(startMillis to createAssignmentRow(assignment))
         }
+
+        filteredEvents.forEach { event ->
+            val startMillis = (event.start?.dateTime ?: event.start?.date)?.value ?: Long.MAX_VALUE
+            mergedItems.add(startMillis to createEventRow(event))
+        }
+
+        mergedItems
+            .sortedBy { it.first }
+            .forEach { (_, rowView) ->
+                b.calendarEventsContainer.addView(rowView)
+            }
     }
 
     private fun createEventRow(event: Event): LinearLayout {
@@ -466,7 +522,8 @@ class HomeFragment : Fragment() {
                     renderSchedulesForDate(selectedDateMillis)
                 }
 
-                Toast.makeText(requireContext(), "앱에 일정이 추가되었습니다.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "앱에 일정이 추가되었습니다.", Toast.LENGTH_SHORT)
+                    .show()
             }
         }
         bottomSheet.show(parentFragmentManager, "ScheduleBottomSheet")
@@ -548,9 +605,11 @@ class HomeFragment : Fragment() {
             return
         }
 
+        val koreaTimeZone = java.util.TimeZone.getTimeZone("Asia/Seoul")
+
         // 시작 시간
-        val (sh, sm) = parseTime(startTime) ?: (9 to 0)  // 기본 09:00
-        val calStart = JavaCalendar.getInstance().apply {
+        val (sh, sm) = parseTime(startTime) ?: (9 to 0)
+        val calStart = JavaCalendar.getInstance(koreaTimeZone).apply {
             set(startYear, startMonth, startDay)
             set(JavaCalendar.HOUR_OF_DAY, sh)
             set(JavaCalendar.MINUTE, sm)
@@ -558,8 +617,8 @@ class HomeFragment : Fragment() {
             set(JavaCalendar.MILLISECOND, 0)
         }
 
-        // 종료 시간 (없으면: 같은 날이면 +1시간, 날짜 다르면 23:59)
-        val calEnd = JavaCalendar.getInstance().apply {
+        // 종료 시간
+        val calEnd = JavaCalendar.getInstance(koreaTimeZone).apply {
             set(endYear, endMonth, endDay)
 
             val parsedEnd = parseTime(endTime)
@@ -581,14 +640,17 @@ class HomeFragment : Fragment() {
             set(JavaCalendar.MILLISECOND, 0)
         }
 
-        val startDateTime = DateTime(calStart.timeInMillis)
-        val endDateTime = DateTime(calEnd.timeInMillis)
-
         val event = Event().apply {
             summary = title
             description = detail
-            start = EventDateTime().setDateTime(startDateTime)
-            end = EventDateTime().setDateTime(endDateTime)
+
+            start = EventDateTime()
+                .setDateTime(DateTime(calStart.timeInMillis))
+                .setTimeZone("Asia/Seoul")
+
+            end = EventDateTime()
+                .setDateTime(DateTime(calEnd.timeInMillis))
+                .setTimeZone("Asia/Seoul")
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -623,6 +685,93 @@ class HomeFragment : Fragment() {
         }
     }
 
+    // -------------------- ✅ 과제(Assignment) 관련 추가 --------------------
+
+    private fun selectedDateString(millis: Long): String {
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        return sdf.format(Date(millis))
+    }
+
+    private suspend fun loadAssignmentsForSelectedDay(): List<AssignmentEntity> {
+        val dateStr = selectedDateString(selectedDateMillis)
+        val dao = AppDatabase.getDatabase(requireContext()).assignmentDao()
+        return dao.getByDueDate(dateStr)
+    }
+
+    /**
+     * ✅ 여기가 핵심 수정:
+     * - 과제 행을 눌렀을 때 EventDetailActivity로 이동하도록 setOnClickListener 추가
+     */
+    private fun createAssignmentRow(a: AssignmentEntity): LinearLayout {
+        val container = LinearLayout(requireContext()).apply {
+            orientation = LinearLayout.HORIZONTAL
+            setPadding(0, 8, 0, 8)
+            isClickable = true
+            isFocusable = true
+        }
+
+        val timeView = TextView(requireContext()).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                0,
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                0.3f
+            )
+            text = a.startTime ?: "09:00"
+            setTypeface(null, Typeface.BOLD)
+            setTextColor(ContextCompat.getColor(requireContext(), R.color.text_primary))
+        }
+
+        val titleView = TextView(requireContext()).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                0,
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                0.7f
+            )
+
+            val label = if (a.type == "팀 프로젝트") "[팀 과제]" else "[개인 과제]"
+            text = "$label ${a.title}"
+
+            setTextColor(ContextCompat.getColor(requireContext(), R.color.text_primary))
+        }
+
+        container.addView(timeView)
+        container.addView(titleView)
+
+        container.setOnClickListener {
+            val label = if (a.type == "팀 프로젝트") "[팀 과제]" else "[개인 과제]"
+
+            val startMillis = assignmentDateTimeToMillis(a.dueDate, a.startTime ?: "09:00")
+            val endMillis = assignmentDateTimeToMillis(a.dueDate, a.endTime ?: "10:00")
+
+            val intent = Intent(requireContext(), EventDetailActivity::class.java).apply {
+                putExtra("title", "$label ${a.title}")
+                putExtra("eventId", "assignment:${a.id}")
+                putExtra("htmlLink", "")
+                putExtra("startMillis", startMillis)
+                putExtra("endMillis", endMillis)
+                putExtra("isAssignment", true)
+                putExtra("assignmentId", a.id)
+            }
+            detailLauncher.launch(intent)
+        }
+
+        return container
+    }
+
+    // ✅ dueDate("yyyy-MM-dd") -> 해당 날짜 00:00 millis 로 변환
+    private fun dueDateToDayStartMillis(dueDate: String): Long {
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val parsed = sdf.parse(dueDate) ?: Date()
+        val cal = JavaCalendar.getInstance().apply {
+            time = parsed
+            set(JavaCalendar.HOUR_OF_DAY, 0)
+            set(JavaCalendar.MINUTE, 0)
+            set(JavaCalendar.SECOND, 0)
+            set(JavaCalendar.MILLISECOND, 0)
+        }
+        return cal.timeInMillis
+    }
+
     // -------------------- 공통 --------------------
 
     private fun showStatus(message: String) {
@@ -634,5 +783,28 @@ class HomeFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+    private fun assignmentDateTimeToMillis(dueDate: String, hhmm: String): Long {
+        val koreaTimeZone = java.util.TimeZone.getTimeZone("Asia/Seoul")
+
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).apply {
+            timeZone = koreaTimeZone
+        }
+
+        val parsedDate = sdf.parse(dueDate) ?: Date()
+
+        val parts = hhmm.split(":")
+        val hour = parts.getOrNull(0)?.toIntOrNull() ?: 9
+        val minute = parts.getOrNull(1)?.toIntOrNull() ?: 0
+
+        val cal = JavaCalendar.getInstance(koreaTimeZone).apply {
+            time = parsedDate
+            set(JavaCalendar.HOUR_OF_DAY, hour)
+            set(JavaCalendar.MINUTE, minute)
+            set(JavaCalendar.SECOND, 0)
+            set(JavaCalendar.MILLISECOND, 0)
+        }
+
+        return cal.timeInMillis
     }
 }

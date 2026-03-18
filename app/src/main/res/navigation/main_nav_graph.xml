@@ -18,11 +18,12 @@
         android:id="@+id/notesFragment"
         android:name="com.example.myapplication.NotesFragment"
         android:label="필기요약">
-        <!-- 요약 파일 관리 화면으로 이동하는 액션 -->
-        <action
-            android:id="@+id/action_notesFragment_to_manageFilesFragment"
-            app:destination="@id/manageFilesFragment" />
-    </fragment>
+    <!-- 요약 파일 관리 화면으로 이동하는 액션 -->
+    <action
+        android:id="@+id/action_notesFragment_to_manageFilesFragment"
+        app:destination="@id/manageFilesFragment" />
+
+</fragment>
 
     <fragment
         android:id="@+id/analyticsFragment"
@@ -38,5 +39,6 @@
         android:id="@+id/manageFilesFragment"
         android:name="com.example.myapplication.ManageFilesFragment"
         android:label="요약 파일 관리" />
+
 
 </navigation>
