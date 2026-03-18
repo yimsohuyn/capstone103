@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@color/background_primary"
+    android:padding="20dp">
+
+    <!-- 타이틀 -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="AI 요약 결과"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="@color/text_primary"
+        android:gravity="center"
+        android:paddingBottom="16dp" />
+
+    <!-- 구분선 -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider_light" />
+
+    <!-- 요약 결과 텍스트 (스크롤 가능) -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="12dp"
+        android:maxHeight="400dp"
+        android:fadeScrollbars="false">
+
+        <TextView
+            android:id="@+id/tvSummaryResult"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="@color/text_primary"
+            android:textSize="15sp"
+            android:lineSpacingExtra="4dp"
+            android:textIsSelectable="true" />
+    </ScrollView>
+
+    <!-- 구분선 -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider_light"
+        android:layout_marginTop="16dp" />
+
+    <!-- 하단 버튼 영역 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="16dp">
+
+        <!-- txt 파일로 저장 버튼 -->
+        <Button
+            android:id="@+id/btnSaveAsTxt"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:text="txt 저장"
+            android:textSize="14sp"
+            android:textColor="@color/white"
+            android:backgroundTint="@color/accent_teal"
+            android:layout_marginEnd="8dp" />
+
+        <!-- 공유 버튼 -->
+        <Button
+            android:id="@+id/btnShare"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:text="공유"
+            android:textSize="14sp"
+            android:textColor="@color/accent_teal"
+            android:backgroundTint="@color/background_secondary"
+            android:layout_marginStart="8dp" />
+    </LinearLayout>
+
+</LinearLayout>

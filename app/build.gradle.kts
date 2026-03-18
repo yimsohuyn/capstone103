@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -23,7 +25,15 @@ android {
     buildFeatures {
         compose = true
         viewBinding = true
+        buildConfig = true
     }
+    // local.properties에서 GEMINI_API_KEY 읽어오기
+    val localProperties = Properties()
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        localProperties.load(localPropertiesFile.inputStream())
+    }
+
     defaultConfig {
         applicationId = "com.example.myapplication"
         minSdk = 24
@@ -33,7 +43,8 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        }
+        buildConfigField("String", "GEMINI_API_KEY", "\"${localProperties.getProperty("GEMINI_API_KEY", "")}\"")
+    }
 
 
     buildTypes {
@@ -108,6 +119,13 @@ dependencies {
     implementation("androidx.room:room-ktx:$room_version")
     kapt("androidx.room:room-compiler:$room_version")
 
+    // ML Kit 텍스트 인식 (OCR)
+    implementation("com.google.mlkit:text-recognition:16.0.1")
+    implementation("com.google.mlkit:text-recognition-korean:16.0.1")
+
+    // Gemini REST API 직접 호출용
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("org.json:json:20240303")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@color/background_primary"
+    android:padding="20dp">
+
+    <!-- 타이틀 -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="AI 필기 요약"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="@color/text_primary"
+        android:gravity="center"
+        android:paddingBottom="16dp" />
+
+    <!-- 구분선 -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider_light" />
+
+    <!-- 선택된 파일 목록 제목 -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="선택된 파일"
+        android:textSize="14sp"
+        android:textColor="@color/text_secondary"
+        android:paddingTop="16dp"
+        android:paddingBottom="8dp" />
+
+    <!-- 선택된 파일 목록 (RecyclerView) -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvSelectedFiles"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:maxHeight="200dp"
+        android:nestedScrollingEnabled="false" />
+
+    <!-- 구분선 -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider_light"
+        android:layout_marginTop="12dp" />
+
+    <!-- 추가 프롬프트 입력 안내 -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="요약 방향 (선택사항)"
+        android:textSize="14sp"
+        android:textColor="@color/text_secondary"
+        android:paddingTop="16dp"
+        android:paddingBottom="8dp" />
+
+    <!-- 추가 프롬프트 입력란 -->
+    <EditText
+        android:id="@+id/etPrompt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="80dp"
+        android:background="@drawable/bg_edit_text_rounded"
+        android:padding="12dp"
+        android:hint="예: 핵심 키워드 중심으로 요약해줘"
+        android:textColorHint="@color/text_hint"
+        android:textColor="@color/text_primary"
+        android:textSize="14sp"
+        android:gravity="top|start"
+        android:inputType="textMultiLine" />
+
+    <!-- 요약하기 버튼 -->
+    <Button
+        android:id="@+id/btnSummarize"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="20dp"
+        android:text="요약하기"
+        android:textSize="16sp"
+        android:textColor="@color/white"
+        android:backgroundTint="@color/accent_teal" />
+
+    <!-- 로딩 표시 -->
+    <LinearLayout
+        android:id="@+id/layoutLoading"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:paddingTop="16dp"
+        android:visibility="gone">
+
+        <ProgressBar
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:indeterminateTint="@color/accent_teal" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="요약 중..."
+            android:textColor="@color/text_secondary"
+            android:textSize="14sp"
+            android:layout_marginStart="8dp" />
+    </LinearLayout>
+
+</LinearLayout>

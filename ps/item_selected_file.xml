@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingVertical="10dp"
+    android:paddingHorizontal="4dp">
+
+    <!-- 파일 아이콘 (이미지는 썸네일, 텍스트는 아이콘) -->
+    <ImageView
+        android:id="@+id/ivFileThumbnail"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/outline_files_24"
+        app:tint="@color/accent_teal" />
+
+    <!-- 파일명 -->
+    <TextView
+        android:id="@+id/tvSelectedFileName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="파일명"
+        android:textColor="@color/text_primary"
+        android:textSize="14sp"
+        android:maxLines="1"
+        android:ellipsize="middle"
+        android:layout_marginStart="12dp" />
+
+    <!-- 삭제(제거) 버튼 -->
+    <ImageButton
+        android:id="@+id/btnRemoveFile"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@android:drawable/ic_delete"
+        android:contentDescription="파일 제거" />
+
+</LinearLayout>

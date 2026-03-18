@@ -14,11 +14,6 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
 
-/**
- * 필기요약 탭 메인 프래그먼트
- * - AI 필기 요약: 이미지/텍스트 파일을 선택하여 OCR → AI 요약 수행
- * - 요약 파일: 저장된 요약 파일을 관리하는 화면으로 이동
- */
 class NotesFragment : Fragment(R.layout.fragment_notes) {
 
     // AI 필기 요약용: 이미지/텍스트 다중 파일 선택 (최대 5개)
@@ -40,7 +35,7 @@ class NotesFragment : Fragment(R.layout.fragment_notes) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // 뒤로가기 버튼
+        // fragment_notes.xml 안의 뒤로가기 버튼
         val backButton: ImageButton = view.findViewById(R.id.btnBack)
         backButton.setOnClickListener {
             parentFragmentManager.popBackStack()

@@ -2,43 +2,33 @@ package com.example.myapplication
 
 import android.app.AlertDialog
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import java.io.File
 
-class ManageFilesDialogFragment : BottomSheetDialogFragment() {
+class ManageFilesFragment : Fragment(R.layout.fragment_manage_files) {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var emptyText: TextView
     private val fileList = mutableListOf<File>()
     private lateinit var adapter: FileListAdapter
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_manage_files, container, false)
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // 바텀시트를 펼친 상태로 시작
-        (dialog as? BottomSheetDialog)?.behavior?.state = BottomSheetBehavior.STATE_EXPANDED
-
-        // 닫기 버튼
-        val btnClose: ImageButton = view.findViewById(R.id.btnCloseManageFiles)
-        btnClose.setOnClickListener { dismiss() }
+        // 뒤로가기 버튼
+        val btnBack: ImageButton = view.findViewById(R.id.btnBackManageFiles)
+        btnBack.setOnClickListener {
+            findNavController().popBackStack()
+        }
 
         // 빈 목록 안내 텍스트
         emptyText = view.findViewById(R.id.tvEmptyFiles)
