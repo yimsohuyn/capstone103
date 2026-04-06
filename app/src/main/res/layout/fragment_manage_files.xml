@@ -6,47 +6,116 @@
     android:layout_height="match_parent"
     android:background="@color/background_primary">
 
-    <!-- 상단바 -->
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/manageFilesTopBar"
+    <!-- 상단바 컨테이너: 일반 모드 / 선택 모드 둘 다 여기에 포함 -->
+    <FrameLayout
+        android:id="@+id/topBarContainer"
         android:layout_width="0dp"
         android:layout_height="60dp"
-        android:background="@color/background_primary"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-    <!-- 뒤로가기 버튼 -->
-    <ImageButton
-        android:id="@+id/btnBackManageFiles"
-        android:layout_width="45dp"
-        android:layout_height="45dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:src="@drawable/ic_back"
-        android:contentDescription="뒤로가기"
-        app:tint="@color/icon_primary"
-        android:clickable="true"
-        android:focusable="true"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        <!-- ===== 일반 모드 상단바 ===== -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/manageFilesTopBar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/background_primary">
 
-    <!-- 타이틀 -->
-    <TextView
-        android:id="@+id/manageFilesTitleText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="요약 파일 관리"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:textColor="@color/text_primary"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:gravity="center" />
+            <!-- 뒤로가기 버튼 -->
+            <ImageButton
+                android:id="@+id/btnBackManageFiles"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_back"
+                android:contentDescription="뒤로가기"
+                app:tint="@color/icon_primary"
+                android:clickable="true"
+                android:focusable="true"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+            <!-- 타이틀 -->
+            <TextView
+                android:id="@+id/manageFilesTitleText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="요약 파일 관리"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:gravity="center" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- ===== 선택 모드 액션바 (기본 숨김) ===== -->
+        <LinearLayout
+            android:id="@+id/selectionActionBar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@color/accent_teal"
+            android:paddingHorizontal="8dp"
+            android:visibility="gone">
+
+            <!-- 선택 취소(←) 버튼 -->
+            <ImageButton
+                android:id="@+id/btnCancelSelection"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_back"
+                app:tint="@color/white"
+                android:contentDescription="선택 취소" />
+
+            <!-- 선택 개수 표시 -->
+            <TextView
+                android:id="@+id/tvSelectionCount"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="0개 선택"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginStart="8dp" />
+
+            <!-- 이동 버튼 -->
+            <TextView
+                android:id="@+id/btnMoveSelected"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="이동"
+                android:textColor="@color/white"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="8dp"
+                android:background="?attr/selectableItemBackground" />
+
+            <!-- 삭제 버튼 -->
+            <TextView
+                android:id="@+id/btnDeleteSelected"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="삭제"
+                android:textColor="@color/white"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="8dp"
+                android:background="?attr/selectableItemBackground" />
+
+        </LinearLayout>
+
+    </FrameLayout>
 
     <!-- 구분선 -->
     <View
@@ -54,9 +123,30 @@
     android:layout_width="0dp"
     android:layout_height="1dp"
     android:background="@color/divider"
-    app:layout_constraintTop_toBottomOf="@id/manageFilesTopBar"
+    app:layout_constraintTop_toBottomOf="@id/topBarContainer"
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Breadcrumb 경로 바 -->
+    <HorizontalScrollView
+        android:id="@+id/breadcrumbScrollView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:scrollbars="none"
+        android:background="@color/background_secondary"
+        android:paddingVertical="8dp"
+        android:paddingHorizontal="12dp"
+        app:layout_constraintTop_toBottomOf="@id/dividerManageFiles"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:id="@+id/breadcrumbContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical" />
+    </HorizontalScrollView>
 
     <!-- 파일이 없을 때 안내 텍스트 -->
     <TextView
@@ -69,7 +159,7 @@
     android:gravity="center"
     android:paddingTop="60dp"
     android:visibility="gone"
-    app:layout_constraintTop_toBottomOf="@id/dividerManageFiles"
+    app:layout_constraintTop_toBottomOf="@id/breadcrumbScrollView"
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintEnd_toEndOf="parent" />
 
@@ -78,11 +168,24 @@
     android:id="@+id/rvManagedFiles"
     android:layout_width="0dp"
     android:layout_height="0dp"
-    android:layout_marginTop="8dp"
+    android:layout_marginTop="4dp"
     android:paddingHorizontal="8dp"
-    app:layout_constraintTop_toBottomOf="@id/dividerManageFiles"
+    app:layout_constraintTop_toBottomOf="@id/breadcrumbScrollView"
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- 새 폴더 생성 FAB -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabNewFolder"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:src="@android:drawable/ic_input_add"
+        android:contentDescription="새 폴더 만들기"
+        app:backgroundTint="@color/point_assignment"
+        app:tint="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

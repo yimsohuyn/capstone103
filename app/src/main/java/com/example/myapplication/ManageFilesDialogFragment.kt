@@ -109,8 +109,8 @@ class ManageFilesDialogFragment : BottomSheetDialogFragment() {
 
         class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             val tvFileName: TextView = view.findViewById(R.id.tvFileName)
-            val tvFileSize: TextView = view.findViewById(R.id.tvFileSize)
-            val btnDelete: ImageButton = view.findViewById(R.id.btnDeleteFile)
+            val tvFileInfo: TextView = view.findViewById(R.id.tvFileInfo)
+            val btnDelete: ImageButton = view.findViewById(R.id.btnItemMenu)
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -122,7 +122,7 @@ class ManageFilesDialogFragment : BottomSheetDialogFragment() {
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val file = files[position]
             holder.tvFileName.text = file.name
-            holder.tvFileSize.text = formatFileSize(file.length())
+            holder.tvFileInfo.text = formatFileSize(file.length())
             holder.btnDelete.setOnClickListener {
                 onDeleteClick(file, position)
             }

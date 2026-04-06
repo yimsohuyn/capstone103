@@ -7,16 +7,30 @@
     android:orientation="horizontal"
     android:gravity="center_vertical"
     android:paddingVertical="12dp"
-    android:paddingHorizontal="8dp">
+    android:paddingHorizontal="8dp"
+    android:background="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true">
 
-    <!-- 파일 아이콘 -->
+    <!-- 선택 모드용 체크박스 (기본 숨김) -->
+    <CheckBox
+        android:id="@+id/cbSelect"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:layout_marginEnd="8dp"
+        android:clickable="false"
+        android:focusable="false" />
+
+    <!-- 폴더/파일 아이콘 (코드에서 동적으로 변경) -->
     <ImageView
+        android:id="@+id/ivFileIcon"
         android:layout_width="28dp"
         android:layout_height="28dp"
         android:src="@drawable/outline_files_24"
         app:tint="@color/accent_teal" />
 
-    <!-- 파일 이름 + 크기 -->
+    <!-- 파일 이름 + 크기/수정일 -->
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -34,23 +48,25 @@
             android:maxLines="1"
             android:ellipsize="middle" />
 
+        <!-- 파일: 크기 + 수정일 / 폴더: 항목 수 -->
         <TextView
-            android:id="@+id/tvFileSize"
+            android:id="@+id/tvFileInfo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="0 KB"
+            android:text=""
             android:textColor="@color/text_secondary"
             android:textSize="12sp"
             android:layout_marginTop="2dp" />
     </LinearLayout>
 
-    <!-- 삭제 버튼 -->
+    <!-- 3-dot 메뉴 버튼 (개별 항목 이름변경/이동/삭제) -->
     <ImageButton
-        android:id="@+id/btnDeleteFile"
+        android:id="@+id/btnItemMenu"
         android:layout_width="36dp"
         android:layout_height="36dp"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:src="@android:drawable/ic_delete"
-        android:contentDescription="삭제" />
+        android:src="@drawable/ic_more_vert"
+        app:tint="@color/icon_secondary"
+        android:contentDescription="메뉴" />
 
 </LinearLayout>

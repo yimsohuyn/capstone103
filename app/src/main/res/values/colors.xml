@@ -71,6 +71,7 @@
     <color name="accent_alarm">#3C488B</color>
     <color name="accent_red">#FF5722</color>
     <color name="accent_red_dark">#FF3B30</color>
+    <color name="accent_orange">#FF9800</color>
 
     <!-- Calendar specific colors -->
     <color name="calendar_selected_date">#5893F4</color>  <!-- accent_blue 사용 -->

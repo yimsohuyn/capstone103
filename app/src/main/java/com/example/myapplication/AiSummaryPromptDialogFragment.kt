@@ -108,7 +108,7 @@ class AiSummaryPromptDialogFragment : DialogFragment() {
 
                     // Gemini AI를 사용하여 요약 수행
                     val summaryResult = withContext(Dispatchers.IO) {
-                        SummaryHelper.summarizeWithGemini(extractedText, userPrompt)
+                        SummaryHelper.summarize(requireContext(), extractedText, userPrompt)
                     }
 
                     btnSummarize.isEnabled = true
