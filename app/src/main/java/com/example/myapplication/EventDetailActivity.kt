@@ -8,13 +8,14 @@ import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
-import android.widget.*
+import android.widget.ImageButton
+import android.widget.LinearLayout
+import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.example.myapplication.data.AppDatabase
-import com.example.myapplication.data.AssignmentEntity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
 import com.google.api.client.http.javanet.NetHttpTransport
@@ -23,8 +24,11 @@ import com.google.api.client.util.DateTime
 import com.google.api.services.calendar.Calendar
 import com.google.api.services.calendar.CalendarScopes
 import com.google.api.services.calendar.model.EventDateTime
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -97,7 +101,6 @@ class EventDetailActivity : AppCompatActivity() {
             isAlarmOn = newIsAlarmOn
             if (newAlarmTime != null) alarmTime = newAlarmTime
 
-            // 일반 일정이면 구글 캘린더 원본 업데이트
             if (!isAssignment && !eventId.isNullOrBlank()) {
                 updateGoogleEvent(
                     id = eventId!!,
@@ -121,7 +124,6 @@ class EventDetailActivity : AppCompatActivity() {
                 }
             }
 
-            // 과제면 Room DB + 구글 캘린더 같이 업데이트
             if (isAssignment && assignmentId > 0) {
                 lifecycleScope.launch {
                     try {
@@ -140,7 +142,6 @@ class EventDetailActivity : AppCompatActivity() {
 
                             dao.update(updated)
 
-                            // ✅ 구글 캘린더에도 같이 수정
                             if (!updated.googleEventId.isNullOrBlank()) {
                                 updateAssignmentGoogleEvent(updated, newStart, newEnd)
                             }
@@ -377,7 +378,6 @@ class EventDetailActivity : AppCompatActivity() {
         }
     }
 
-    // ✅ 과제와 연결된 구글 캘린더 이벤트 수정
     private fun updateAssignmentGoogleEvent(
         assignment: AssignmentEntity,
         startMillis: Long,
@@ -428,19 +428,37 @@ class EventDetailActivity : AppCompatActivity() {
     }
 
     private fun confirmAndDelete() {
-        AlertDialog.Builder(this)
-            .setTitle(if (isAssignment) "과제 삭제" else "일정 삭제")
-            .setMessage("이 항목을 정말 삭제할까요?")
-            .setPositiveButton("삭제") { _, _ ->
-                if (isAssignment) {
-                    deleteAssignment()
-                } else {
-                    val id = eventId ?: return@setPositiveButton
-                    deleteEvent(id)
-                }
+        val dialogView = layoutInflater.inflate(R.layout.dialog_delete_member, null)
+
+        val textDeleteTitle = dialogView.findViewById<TextView>(R.id.textDeleteTitle)
+        val textDeleteMessage = dialogView.findViewById<TextView>(R.id.textDeleteMessage)
+        val btnCancelDelete = dialogView.findViewById<TextView>(R.id.btnCancelDelete)
+        val btnConfirmDelete = dialogView.findViewById<TextView>(R.id.btnConfirmDelete)
+
+        textDeleteTitle.text = if (isAssignment) "과제 삭제" else "일정 삭제"
+        textDeleteMessage.text = "이 항목을 정말 삭제할까요?"
+
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .create()
+
+        dialog.show()
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        btnCancelDelete.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        btnConfirmDelete.setOnClickListener {
+            dialog.dismiss()
+
+            if (isAssignment) {
+                deleteAssignment()
+            } else {
+                val id = eventId ?: return@setOnClickListener
+                deleteEvent(id)
             }
-            .setNegativeButton("취소", null)
-            .show()
+        }
     }
 
     private fun deleteAssignment() {
@@ -450,26 +468,92 @@ class EventDetailActivity : AppCompatActivity() {
         }
 
         lifecycleScope.launch {
+            val dao = AppDatabase.getDatabase(this@EventDetailActivity).assignmentDao()
+
             try {
                 withContext(Dispatchers.IO) {
-                    val dao = AppDatabase.getDatabase(this@EventDetailActivity).assignmentDao()
                     val assignment = dao.getById(assignmentId)
                         ?: throw IllegalStateException("과제를 찾을 수 없습니다.")
 
-                    // 1) 구글 캘린더에서도 삭제
                     if (!assignment.googleEventId.isNullOrBlank()) {
-                        val service = buildCalendarService()
-                        service?.events()
-                            ?.delete("primary", assignment.googleEventId)
-                            ?.execute()
+                        try {
+                            val service = buildCalendarService()
+                            service?.events()
+                                ?.delete("primary", assignment.googleEventId)
+                                ?.execute()
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
                     }
 
-                    // 2) 앱 DB에서도 삭제
+                    if (
+                        assignment.type == "팀 프로젝트" &&
+                        !assignment.teamId.isNullOrBlank() &&
+                        !assignment.remoteId.isNullOrBlank()
+                    ) {
+                        try {
+                            val db = FirebaseFirestore.getInstance()
+                            val assignmentRef = db.collection("teams")
+                                .document(assignment.teamId!!)
+                                .collection("assignments")
+                                .document(assignment.remoteId!!)
+
+                            val meetingsSnapshot = assignmentRef.collection("meetings").get().await()
+                            for (doc in meetingsSnapshot.documents) {
+                                try {
+                                    doc.reference.delete().await()
+                                } catch (e: Exception) {
+                                    e.printStackTrace()
+                                }
+                            }
+
+                            val filesSnapshot = assignmentRef.collection("files").get().await()
+                            for (doc in filesSnapshot.documents) {
+                                val fileUrl = doc.getString("fileUri")
+
+                                try {
+                                    if (!fileUrl.isNullOrBlank()) {
+                                        FirebaseStorage.getInstance()
+                                            .getReferenceFromUrl(fileUrl)
+                                            .delete()
+                                            .await()
+                                    }
+                                } catch (e: Exception) {
+                                    e.printStackTrace()
+                                }
+
+                                try {
+                                    doc.reference.delete().await()
+                                } catch (e: Exception) {
+                                    e.printStackTrace()
+                                }
+                            }
+
+                            val membersSnapshot = assignmentRef.collection("members").get().await()
+                            for (doc in membersSnapshot.documents) {
+                                try {
+                                    doc.reference.delete().await()
+                                } catch (e: Exception) {
+                                    e.printStackTrace()
+                                }
+                            }
+
+                            try {
+                                assignmentRef.delete().await()
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    }
+
                     dao.deleteById(assignmentId)
                 }
 
                 Toast.makeText(this@EventDetailActivity, "삭제되었습니다.", Toast.LENGTH_SHORT).show()
                 finish()
+
             } catch (e: Exception) {
                 e.printStackTrace()
                 Toast.makeText(this@EventDetailActivity, "오류가 발생했습니다.", Toast.LENGTH_SHORT).show()

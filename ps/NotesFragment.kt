@@ -16,7 +16,7 @@ import java.io.InputStream
 
 class NotesFragment : Fragment(R.layout.fragment_notes) {
 
-    // AI 필기 요약용: 이미지/텍스트 다중 파일 선택 (최대 5개)
+    // AI 요약용: 이미지/텍스트 다중 파일 선택 (최대 5개)
     private val pickMultipleFilesLauncher = registerForActivityResult(
         ActivityResultContracts.OpenMultipleDocuments()
     ) { uris: List<Uri> ->
@@ -41,7 +41,7 @@ class NotesFragment : Fragment(R.layout.fragment_notes) {
             parentFragmentManager.popBackStack()
         }
 
-        // settingInfo1 (AI 필기 요약) - 이미지/텍스트 파일 다중 선택
+        // settingInfo1 (AI 요약) - 이미지/텍스트 파일 다중 선택
         val settingInfo1: LinearLayout = view.findViewById(R.id.settingInfo1)
         settingInfo1.setOnClickListener {
             // 이미지 및 텍스트 파일 선택 가능

@@ -1,4 +1,4 @@
-package com.example.myapplication.data
+package com.example.myapplication
 
 import android.content.Context
 import androidx.room.Database
@@ -12,7 +12,7 @@ import androidx.room.RoomDatabase
         ProjectFileEntity::class,
         AssignmentEntity::class
     ],
-    version = 6,
+    version = 7,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

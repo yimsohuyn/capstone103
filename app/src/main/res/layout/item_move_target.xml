@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/textMoveTarget"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="이동 대상"
+    android:textColor="@android:color/white"
+    android:textSize="16sp"
+    android:paddingTop="14dp"
+    android:paddingBottom="14dp" />

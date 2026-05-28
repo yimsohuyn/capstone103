@@ -2,6 +2,8 @@ package com.example.myapplication
 
 import android.app.DatePickerDialog
 import android.content.Intent
+import android.content.res.Configuration
+import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
 import android.text.InputFilter
@@ -15,25 +17,20 @@ import java.util.Locale
 
 class EditEventActivity : AppCompatActivity() {
 
-    // 인텐트로 받은 값들
     private var eventId: String? = null
     private var startMillis: Long = -1L
     private var endMillis: Long = -1L
     private var isAssignment: Boolean = false
     private var assignmentId: Int = -1
 
-    // ✅ 서울 시간대로 고정
     private val koreaTimeZone = java.util.TimeZone.getTimeZone("Asia/Seoul")
 
-    // 날짜/시간 계산용 캘린더
     private val startCal: Calendar = Calendar.getInstance(koreaTimeZone)
     private val endCal: Calendar = Calendar.getInstance(koreaTimeZone)
 
-    // 알림 관련
     private var isAlarmOn: Boolean = false
     private var alarmTime: String? = null
 
-    // 포맷터
     private val dateFormatter = SimpleDateFormat("yyyy년 M월 d일 (E)", Locale.KOREAN).apply {
         timeZone = koreaTimeZone
     }
@@ -42,11 +39,20 @@ class EditEventActivity : AppCompatActivity() {
         timeZone = koreaTimeZone
     }
 
+    private fun isDarkMode(): Boolean {
+        val currentNightMode =
+            resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+        return currentNightMode == Configuration.UI_MODE_NIGHT_YES
+    }
+
+    private fun pickerButtonColor(): Int {
+        return if (isDarkMode()) Color.WHITE else Color.BLACK
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_event)
 
-        // 1. Intent 데이터 수신
         val title = intent.getStringExtra("title") ?: ""
         val detail = intent.getStringExtra("detail") ?: ""
         eventId = intent.getStringExtra("eventId")
@@ -58,7 +64,6 @@ class EditEventActivity : AppCompatActivity() {
         isAssignment = intent.getBooleanExtra("isAssignment", false)
         assignmentId = intent.getIntExtra("assignmentId", -1)
 
-        // 2. UI 연결
         val editTitle = findViewById<EditText>(R.id.editTitle)
         val editStartDate = findViewById<TextView>(R.id.editStartDate)
         val editStartTime = findViewById<EditText>(R.id.editStartTime)
@@ -77,7 +82,6 @@ class EditEventActivity : AppCompatActivity() {
         val btnSave = findViewById<Button>(R.id.btnSave)
         val btnBack = findViewById<ImageButton>(R.id.btnBack)
 
-        // 3. 캘린더 초기화
         if (startMillis > 0) {
             startCal.timeInMillis = startMillis
         } else {
@@ -90,7 +94,6 @@ class EditEventActivity : AppCompatActivity() {
             endCal.timeInMillis = startCal.timeInMillis + 60 * 60 * 1000
         }
 
-        // 4. UI 초기값 세팅
         editTitle.setText(title)
         etDetail.setText(detail)
 
@@ -99,7 +102,6 @@ class EditEventActivity : AppCompatActivity() {
         editStartTime.setText(timeFormatter.format(startCal.time))
         editEndTime.setText(timeFormatter.format(endCal.time))
 
-        // 알림 초기값
         switchAlarm.isChecked = isAlarmOn
         if (isAlarmOn) {
             rowAlarmTime.visibility = View.VISIBLE
@@ -111,7 +113,6 @@ class EditEventActivity : AppCompatActivity() {
             rowAlarmTime.visibility = View.GONE
         }
 
-        // 시간 입력 포맷터
         class TimeFormattingTextWatcher(private val editText: EditText) : TextWatcher {
             private var isFormatting = false
 
@@ -149,7 +150,6 @@ class EditEventActivity : AppCompatActivity() {
         editEndTime.addTextChangedListener(TimeFormattingTextWatcher(editEndTime))
         editAlarmTime.addTextChangedListener(TimeFormattingTextWatcher(editAlarmTime))
 
-        // 날짜 선택
         fun showDatePicker(isStart: Boolean) {
             val cal = if (isStart) startCal else endCal
 
@@ -163,20 +163,26 @@ class EditEventActivity : AppCompatActivity() {
                 }
             }
 
-            DatePickerDialog(
+            val dialog = DatePickerDialog(
                 this,
-                R.style.CustomDatePickerDialogTheme,
                 listener,
                 cal.get(Calendar.YEAR),
                 cal.get(Calendar.MONTH),
                 cal.get(Calendar.DAY_OF_MONTH)
-            ).show()
+            )
+
+            dialog.setOnShowListener {
+                val buttonColor = if (isDarkMode()) Color.WHITE else Color.BLACK
+                dialog.getButton(DatePickerDialog.BUTTON_POSITIVE)?.setTextColor(buttonColor)
+                dialog.getButton(DatePickerDialog.BUTTON_NEGATIVE)?.setTextColor(buttonColor)
+            }
+
+            dialog.show()
         }
 
         editStartDate.setOnClickListener { showDatePicker(isStart = true) }
         editEndDate.setOnClickListener { showDatePicker(isStart = false) }
 
-        // 하루 종일 스위치
         switchAllDay.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
                 editStartTime.setText("00:00")
@@ -189,13 +195,11 @@ class EditEventActivity : AppCompatActivity() {
             }
         }
 
-        // 알림 스위치
         switchAlarm.setOnCheckedChangeListener { _, checked ->
             isAlarmOn = checked
             rowAlarmTime.visibility = if (checked) View.VISIBLE else View.GONE
         }
 
-        // 버튼 리스너
         btnCancel.setOnClickListener { finish() }
         btnBack.setOnClickListener { finish() }
 

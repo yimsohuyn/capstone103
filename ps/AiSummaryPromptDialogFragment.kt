@@ -23,7 +23,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 /**
- * AI 필기 요약 프롬프트 다이얼로그
+ * AI 요약 프롬프트 다이얼로그
  * 사용자가 선택한 파일 목록을 확인하고, 요약 방향을 입력한 뒤 요약을 시작하는 팝업.
  */
 class AiSummaryPromptDialogFragment : DialogFragment() {

@@ -55,7 +55,7 @@
     <color name="background_home_gradient">#D2D8EF</color>
 
     <!-- UI Elements -->
-    <color name="divider">#FFFFFF</color>
+    <color name="divider">#D9D9D9</color>
     <color name="divider_light">#DDDDDD</color>
     <color name="underline">#BDBDBD</color>
 
@@ -82,5 +82,57 @@
     <!-- Status Colors -->
     <color name="text_error">#FF3B30</color>
     <color name="text_dialog">#333333</color>
+
+    <color name="view_all_text">#000000</color>
+
+    <color name="assignment_item_card_bg">#FFFFFF</color>
+    <color name="assignment_item_card_stroke">#D9D9D9</color>
+
+    <color name="assignment_team_icon_bg">#7A5AF8</color>
+    <color name="assignment_personal_icon_bg">#4A90E2</color>
+
+    <color name="assignment_view_all_text">#AEB8FF</color>
+
+    <color name="team_invite_button_text">#000000</color>
+    <color name="team_invite_button_bg">#F1F1F1</color>
+
+    <color name="quiz_bg">#F6F7FB</color>
+    <color name="quiz_card">#FFFFFF</color>
+    <color name="quiz_card_border">#D9DFEA</color>
+
+    <color name="quiz_text_primary">#111827</color>
+    <color name="quiz_text_secondary">#6B7280</color>
+
+    <color name="quiz_hint_bg">#F8FAFC</color>
+    <color name="quiz_hint_border">#D9DFEA</color>
+
+    <color name="quiz_mode_badge_bg">#EEE8FF</color>
+    <color name="quiz_mode_badge_text">#6E44CC</color>
+
+    <color name="quiz_option_bg">#FFFFFF</color>
+    <color name="quiz_option_border">#D9DFEA</color>
+    <color name="quiz_option_selected_bg">#EEF4FF</color>
+    <color name="quiz_option_selected_border">#4C7DFF</color>
+
+    <color name="quiz_input_bg">#FFFFFF</color>
+    <color name="quiz_input_border">#D9DFEA</color>
+
+    <color name="quiz_button_secondary_bg">#FFFFFF</color>
+    <color name="quiz_button_secondary_border">#D9DFEA</color>
+    <color name="quiz_button_secondary_text">#111827</color>
+
+    <color name="quiz_progress_bg">#E5E7EB</color>
+    <color name="quiz_question_icon_bg">#7C5CFA</color>
+
+    <color name="result_bg">#F6F7FB</color>
+    <color name="result_card">#FFFFFF</color>
+    <color name="result_card_border">#D9DFEA</color>
+    <color name="result_text_primary">#111827</color>
+    <color name="result_text_secondary">#6B7280</color>
+    <color name="result_divider">#E5E7EB</color>
+    <color name="result_accent_blue">#5B7CFF</color>
+    <color name="result_accent_purple">#8B5CF6</color>
+    <color name="result_error">#EF4444</color>
+    <color name="result_success">#22C55E</color>
 
 </resources>

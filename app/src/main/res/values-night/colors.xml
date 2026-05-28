@@ -82,4 +82,56 @@
     <color name="text_error">#FF5748</color>
     <color name="text_dialog">#E0E0E0</color>
 
+    <color name="view_all_text">#ffffff</color>
+
+    <color name="assignment_item_card_bg">#2F2F2F</color>
+    <color name="assignment_item_card_stroke">#454545</color>
+
+    <color name="assignment_team_icon_bg">#6C4AB6</color>
+    <color name="assignment_personal_icon_bg">#3F72AF</color>
+
+    <color name="assignment_view_all_text">#4A4FD1</color>
+
+    <color name="team_invite_button_text">#FFFFFF</color>
+    <color name="team_invite_button_bg">#2F2F2F</color>
+
+    <color name="quiz_bg">#14161C</color>
+    <color name="quiz_card">#23262F</color>
+    <color name="quiz_card_border">#343845</color>
+
+    <color name="quiz_text_primary">#FFFFFF</color>
+    <color name="quiz_text_secondary">#B8BFCC</color>
+
+    <color name="quiz_hint_bg">#20242C</color>
+    <color name="quiz_hint_border">#343845</color>
+
+    <color name="quiz_mode_badge_bg">#2A2338</color>
+    <color name="quiz_mode_badge_text">#C99BFF</color>
+
+    <color name="quiz_option_bg">#23262F</color>
+    <color name="quiz_option_border">#343845</color>
+    <color name="quiz_option_selected_bg">#1F2C48</color>
+    <color name="quiz_option_selected_border">#4C7DFF</color>
+
+    <color name="quiz_input_bg">#23262F</color>
+    <color name="quiz_input_border">#343845</color>
+
+    <color name="quiz_button_secondary_bg">#23262F</color>
+    <color name="quiz_button_secondary_border">#343845</color>
+    <color name="quiz_button_secondary_text">#FFFFFF</color>
+
+    <color name="quiz_progress_bg">#2A2D36</color>
+    <color name="quiz_question_icon_bg">#6D4CCF</color>
+
+    <color name="result_bg">#14161C</color>
+    <color name="result_card">#1E2230</color>
+    <color name="result_card_border">#5B35E5</color>
+    <color name="result_text_primary">#FFFFFF</color>
+    <color name="result_text_secondary">#B8BFCC</color>
+    <color name="result_divider">#343845</color>
+    <color name="result_accent_blue">#8EA2FF</color>
+    <color name="result_accent_purple">#A970FF</color>
+    <color name="result_error">#FF5E5E</color>
+    <color name="result_success">#4ADE80</color>
+
 </resources>

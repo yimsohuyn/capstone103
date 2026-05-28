@@ -5,18 +5,18 @@ import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.graphics.Typeface
 import android.os.Bundle
-import android.view.LayoutInflater
+import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.core.view.setPadding
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import com.example.myapplication.data.AppDatabase
-import com.example.myapplication.data.AssignmentEntity
 import com.example.myapplication.databinding.FragmentHomeBinding
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
@@ -41,10 +41,19 @@ import java.util.Calendar as JavaCalendar
 import java.util.Date
 import java.util.Locale
 
-// 앱 내부 로컬 일정 데이터 (time = 시작 시간)
 data class Schedule(
     val title: String,
     val time: String? = "시간 미지정"
+)
+
+private data class ScheduleUiItem(
+    val sortMillis: Long,
+    val timeLabel: String,
+    val title: String,
+    val subtitle: String,
+    val accentColorRes: Int,
+    val onClick: (() -> Unit)? = null,
+    val isForSelectedDate: Boolean = true
 )
 
 class HomeFragment : Fragment() {
@@ -54,21 +63,22 @@ class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
-    // 구글 로그인 / 캘린더
     private lateinit var googleSignInClient: GoogleSignInClient
     private var calendarService: Calendar? = null
     private var ddayDialog: DdayDialogFragment? = null
 
-    // 날짜 + 시간 포맷
     private var selectedDateMillis: Long = System.currentTimeMillis()
+
     private val timeFormatter = SimpleDateFormat("HH:mm", Locale.getDefault()).apply {
-        timeZone = java.util.TimeZone.getTimeZone("Asia/Seoul")
+        timeZone = koreaTimeZone
     }
 
-    // 앱 내부에서 관리하는 로컬 일정 (구글 계정 X 일 때만 사용)
+    private val fullDateFormatter = SimpleDateFormat("M월 d일 E요일", Locale.KOREAN).apply {
+        timeZone = koreaTimeZone
+    }
+
     private val schedulesByDate = mutableMapOf<Long, MutableList<Schedule>>()
 
-    // 설정 화면 → 돌아왔을 때
     private val settingLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
@@ -79,10 +89,8 @@ class HomeFragment : Fragment() {
                 } else {
                     calendarService = null
                     showStatus("구글 계정을 연결해주세요.")
-                    _binding?.calendarEventsContainer?.removeAllViews()
                 }
 
-                // 다시 그리기
                 if (calendarService != null) {
                     fetchEventsForSelectedDay()
                 } else {
@@ -93,7 +101,6 @@ class HomeFragment : Fragment() {
             }
         }
 
-    // 상세 화면에서 돌아왔을 때
     private val detailLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
@@ -106,7 +113,6 @@ class HomeFragment : Fragment() {
             }
         }
 
-    // Google 로그인 결과
     private val signInLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             val data = result.data ?: return@registerForActivityResult
@@ -123,7 +129,6 @@ class HomeFragment : Fragment() {
             }
         }
 
-    // 캘린더 권한 재요청
     private val authRecoverLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
@@ -134,7 +139,7 @@ class HomeFragment : Fragment() {
         }
 
     override fun onCreateView(
-        inflater: LayoutInflater,
+        inflater: android.view.LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
@@ -150,7 +155,6 @@ class HomeFragment : Fragment() {
         initCalendarUi()
         initFab()
 
-        // 이미 로그인 되어 있으면 바로 연동
         GoogleSignIn.getLastSignedInAccount(requireContext())?.let {
             onAccountSignedIn(it)
         } ?: run {
@@ -169,8 +173,6 @@ class HomeFragment : Fragment() {
             renderSchedulesForDate(selectedDateMillis)
         }
     }
-
-    // -------------------- 초기 설정 --------------------
 
     private fun setupGoogleClient() {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -198,26 +200,20 @@ class HomeFragment : Fragment() {
     }
 
     private fun initCalendarUi() {
-        // CalendarView 색상 설정 (프로그래밍 방식)
         binding.calendarView.apply {
-            // 선택된 날짜 배경색
             selectedWeekBackgroundColor =
                 ContextCompat.getColor(requireContext(), R.color.calendar_selected_date)
 
-            // 포커스된 월의 날짜 색상
             focusedMonthDateColor =
                 ContextCompat.getColor(requireContext(), R.color.calendar_text)
 
-            // 비포커스 월의 날짜 색상 (주말/다른 달)
             unfocusedMonthDateColor =
                 ContextCompat.getColor(requireContext(), R.color.calendar_weekend)
 
-            // 주 구분선 색상
             weekSeparatorLineColor =
                 ContextCompat.getColor(requireContext(), R.color.divider)
         }
 
-        // 처음 선택 날짜
         selectedDateMillis = binding.calendarView.date
 
         if (calendarService != null) {
@@ -226,7 +222,6 @@ class HomeFragment : Fragment() {
             renderSchedulesForDate(selectedDateMillis)
         }
 
-        // 날짜 바뀔 때마다 로컬 또는 구글 일정 갱신
         binding.calendarView.setOnDateChangeListener { _, year, month, dayOfMonth ->
             val cal = JavaCalendar.getInstance().apply {
                 set(year, month, dayOfMonth, 0, 0, 0)
@@ -248,8 +243,6 @@ class HomeFragment : Fragment() {
         }
     }
 
-    // -------------------- D-day 팝업 --------------------
-
     private fun openDdayPopup() {
         val dialog = DdayDialogFragment().apply {
             this.calendarService = this@HomeFragment.calendarService
@@ -268,8 +261,6 @@ class HomeFragment : Fragment() {
         ddayDialog = dialog
         dialog.show(parentFragmentManager, "ddayDialog")
     }
-
-    // -------------------- 구글 계정 / 캘린더 --------------------
 
     private fun onAccountSignedIn(account: GoogleSignInAccount) {
         val credential = GoogleAccountCredential.usingOAuth2(
@@ -290,27 +281,30 @@ class HomeFragment : Fragment() {
         fetchEventsForSelectedDay()
     }
 
-    /**
-     * ✅ 수정됨:
-     * - 선택한 날짜의 "과제(Assignment)"를 Room DB에서 읽어옴
-     * - 구글 이벤트 + 과제를 같이 렌더링
-     * - 구글 계정이 없어도 과제는 표시됨
-     */
     private fun fetchEventsForSelectedDay() {
         val service = calendarService
         showStatus("일정을 불러오는 중입니다...")
 
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                // 1) 선택 날짜의 과제 먼저 로드
-                val assignments = withContext(Dispatchers.IO) {
+                val selectedAssignments = withContext(Dispatchers.IO) {
                     loadAssignmentsForSelectedDay()
                 }
 
-                // 2) 구글 계정이 없으면: 과제만 표시하고 종료
+                val upcomingAssignments = withContext(Dispatchers.IO) {
+                    loadUpcomingAssignmentsAfterSelectedDay()
+                }
+
                 if (service == null) {
-                    renderGoogleEvents(emptyList(), assignments)
-                    showStatus("총 ${assignments.size}개의 일정이 있습니다.")
+                    val selectedItems = selectedAssignments.map {
+                        buildAssignmentUiItem(it, isForSelectedDate = true)
+                    }
+                    val upcomingItems = upcomingAssignments.map {
+                        buildAssignmentUiItem(it, isForSelectedDate = false)
+                    }
+
+                    renderScheduleItems(selectedItems, upcomingItems)
+                    showStatus("총 ${selectedItems.size}개의 일정이 있습니다.")
                     return@launch
                 }
 
@@ -318,8 +312,7 @@ class HomeFragment : Fragment() {
                     selectedDayBounds(selectedDateMillis)
                 }
 
-                // 3) 선택 날짜의 구글 이벤트 로드
-                val items = withContext(Dispatchers.IO) {
+                val selectedEvents = withContext(Dispatchers.IO) {
                     service.events().list("primary")
                         .setSingleEvents(true)
                         .setOrderBy("startTime")
@@ -329,15 +322,45 @@ class HomeFragment : Fragment() {
                         .items.orEmpty()
                 }
 
+                val upcomingEvents = withContext(Dispatchers.IO) {
+                    service.events().list("primary")
+                        .setSingleEvents(true)
+                        .setOrderBy("startTime")
+                        .setTimeMin(DateTime(selectedDayEndMillis() + 1))
+                        .execute()
+                        .items.orEmpty()
+                }
+
                 if (_binding == null) return@launch
 
-                val filteredEvents = items.filterNot { event ->
+                val filteredSelectedEvents = selectedEvents.filterNot { event ->
                     val title = event.summary ?: ""
                     title.startsWith("[팀 과제]") || title.startsWith("[개인 과제]")
                 }
-                // 4) 같이 렌더링
-                renderGoogleEvents(items, assignments)
-                showStatus("총 ${filteredEvents.size + assignments.size}개의 일정이 있습니다.")
+
+                val filteredUpcomingEvents = upcomingEvents.filterNot { event ->
+                    val title = event.summary ?: ""
+                    title.startsWith("[팀 과제]") || title.startsWith("[개인 과제]")
+                }
+
+                val selectedItems = mutableListOf<ScheduleUiItem>()
+                selectedItems.addAll(selectedAssignments.map {
+                    buildAssignmentUiItem(it, isForSelectedDate = true)
+                })
+                selectedItems.addAll(filteredSelectedEvents.map {
+                    buildEventUiItem(it, isForSelectedDate = true)
+                })
+
+                val upcomingItems = mutableListOf<ScheduleUiItem>()
+                upcomingItems.addAll(upcomingAssignments.map {
+                    buildAssignmentUiItem(it, isForSelectedDate = false)
+                })
+                upcomingItems.addAll(filteredUpcomingEvents.map {
+                    buildEventUiItem(it, isForSelectedDate = false)
+                })
+
+                renderScheduleItems(selectedItems, upcomingItems)
+                showStatus("총 ${selectedItems.size}개의 일정이 있습니다.")
             } catch (ex: Exception) {
                 when (ex) {
                     is UserRecoverableAuthIOException -> {
@@ -345,15 +368,15 @@ class HomeFragment : Fragment() {
                     }
                     else -> {
                         showStatus("캘린더를 불러오지 못했습니다.")
+                        renderScheduleItems(emptyList(), emptyList())
                     }
                 }
             }
         }
     }
 
-    // 선택한 날짜의 0시 ~ 24시 범위
     private fun selectedDayBounds(dayMillis: Long): Pair<DateTime, DateTime> {
-        val cal = JavaCalendar.getInstance().apply {
+        val cal = JavaCalendar.getInstance(koreaTimeZone).apply {
             timeInMillis = dayMillis
             set(JavaCalendar.HOUR_OF_DAY, 0)
             set(JavaCalendar.MINUTE, 0)
@@ -365,101 +388,283 @@ class HomeFragment : Fragment() {
         return DateTime(startMillis) to DateTime(cal.timeInMillis)
     }
 
-    // -------------------- 구글 일정 UI --------------------
+    private fun selectedDayEndMillis(): Long {
+        val cal = JavaCalendar.getInstance(koreaTimeZone).apply {
+            timeInMillis = selectedDateMillis
+            set(JavaCalendar.HOUR_OF_DAY, 23)
+            set(JavaCalendar.MINUTE, 59)
+            set(JavaCalendar.SECOND, 59)
+            set(JavaCalendar.MILLISECOND, 999)
+        }
+        return cal.timeInMillis
+    }
 
-    /**
-     * ✅ 수정됨:
-     * - events(구글) + assignments(과제) 둘 다 받음
-     * - 과제를 먼저 띄우고, 그 다음 구글 이벤트 띄움
-     */
-    private fun renderGoogleEvents(events: List<Event>, assignments: List<AssignmentEntity>) {
+    private fun buildEventUiItem(
+        event: Event,
+        isForSelectedDate: Boolean
+    ): ScheduleUiItem {
+        val startMillis = (event.start?.dateTime ?: event.start?.date)?.value ?: Long.MAX_VALUE
+        val start = (event.start?.dateTime ?: event.start?.date)?.value ?: -1L
+        val end = (event.end?.dateTime ?: event.end?.date)?.value ?: -1L
+
+        return ScheduleUiItem(
+            sortMillis = startMillis,
+            timeLabel = formatEventTime(event),
+            title = event.summary ?: "제목 없음",
+            subtitle = "구글 일정",
+            accentColorRes = R.color.calendar_selected_date,
+            onClick = {
+                val intent = Intent(requireContext(), EventDetailActivity::class.java).apply {
+                    putExtra("title", event.summary ?: "제목 없음")
+                    putExtra("eventId", event.id)
+                    putExtra("htmlLink", event.htmlLink)
+                    putExtra("startMillis", start)
+                    putExtra("endMillis", end)
+                }
+                detailLauncher.launch(intent)
+            },
+            isForSelectedDate = isForSelectedDate
+        )
+    }
+
+    private fun buildAssignmentUiItem(
+        a: AssignmentEntity,
+        isForSelectedDate: Boolean
+    ): ScheduleUiItem {
+        val startMillis = assignmentDateTimeToMillis(a.dueDate, a.startTime ?: "09:00")
+        val endMillis = assignmentDateTimeToMillis(a.dueDate, a.endTime ?: "10:00")
+        val label = if (a.type == "팀 프로젝트") "[팀 과제]" else "[개인 과제]"
+
+        return ScheduleUiItem(
+            sortMillis = startMillis,
+            timeLabel = a.startTime ?: "09:00",
+            title = "$label ${a.title}",
+            subtitle = if (a.type == "팀 프로젝트") "팀 프로젝트" else "개인 프로젝트",
+            accentColorRes = if (a.type == "팀 프로젝트") {
+                R.color.point_assignment
+            } else {
+                R.color.calendar_selected_date
+            },
+            onClick = {
+                val intent = Intent(requireContext(), EventDetailActivity::class.java).apply {
+                    putExtra("title", "$label ${a.title}")
+                    putExtra("eventId", "assignment:${a.id}")
+                    putExtra("htmlLink", "")
+                    putExtra("startMillis", startMillis)
+                    putExtra("endMillis", endMillis)
+                    putExtra("isAssignment", true)
+                    putExtra("assignmentId", a.id)
+                }
+                detailLauncher.launch(intent)
+            },
+            isForSelectedDate = isForSelectedDate
+        )
+    }
+
+    private fun buildLocalUiItem(dateMillis: Long, schedule: Schedule): ScheduleUiItem {
+        val sortMillis = localScheduleDateTimeToMillis(dateMillis, schedule.time)
+        return ScheduleUiItem(
+            sortMillis = sortMillis,
+            timeLabel = schedule.time ?: "시간 미지정",
+            title = schedule.title,
+            subtitle = "개인 일정",
+            accentColorRes = R.color.calendar_selected_date,
+            onClick = null,
+            isForSelectedDate = true
+        )
+    }
+
+    private fun renderScheduleItems(
+        selectedItems: List<ScheduleUiItem>,
+        upcomingItems: List<ScheduleUiItem>
+    ) {
         val b = _binding ?: return
         b.calendarEventsContainer.removeAllViews()
 
-        // 과제로 동기화된 구글 이벤트는 숨김
-        val filteredEvents = events.filterNot { event ->
-            val title = event.summary ?: ""
-            title.startsWith("[팀 과제]") || title.startsWith("[개인 과제]")
-        }
+        val sortedSelectedItems = selectedItems.sortedBy { it.sortMillis }
+        val sortedUpcomingItems = upcomingItems.sortedBy { it.sortMillis }
 
-        if (filteredEvents.isEmpty() && assignments.isEmpty()) {
-            b.calendarEventsContainer.addView(
-                TextView(requireContext()).apply {
-                    text = "선택한 날짜에 일정이 없습니다."
-                    setTextColor(ContextCompat.getColor(requireContext(), R.color.text_secondary))
-                }
-            )
+        updateTodaySummary(sortedSelectedItems, sortedUpcomingItems)
+
+        if (sortedSelectedItems.isEmpty()) {
+            b.calendarEventsContainer.addView(createEmptyStateView())
             return
         }
 
-        // ✅ 과제 + 일반 일정을 한 리스트로 합쳐서 시간순 정렬
-        val mergedItems = mutableListOf<Pair<Long, View>>()
-
-        assignments.forEach { assignment ->
-            val startMillis = assignmentDateTimeToMillis(
-                assignment.dueDate,
-                assignment.startTime ?: "09:00"
-            )
-            mergedItems.add(startMillis to createAssignmentRow(assignment))
-        }
-
-        filteredEvents.forEach { event ->
-            val startMillis = (event.start?.dateTime ?: event.start?.date)?.value ?: Long.MAX_VALUE
-            mergedItems.add(startMillis to createEventRow(event))
-        }
-
-        mergedItems
-            .sortedBy { it.first }
-            .forEach { (_, rowView) ->
-                b.calendarEventsContainer.addView(rowView)
-            }
+        b.calendarEventsContainer.addView(createScheduleListCard(sortedSelectedItems))
     }
 
-    private fun createEventRow(event: Event): LinearLayout {
-        val container = LinearLayout(requireContext()).apply {
+    private fun updateTodaySummary(
+        selectedItems: List<ScheduleUiItem>,
+        upcomingItems: List<ScheduleUiItem>
+    ) {
+        val dateLabel = fullDateFormatter.format(Date(selectedDateMillis))
+        binding.todayMetaText.text = "$dateLabel · 일정 ${selectedItems.size}개"
+
+        binding.summaryChipContainer.removeAllViews()
+
+        val totalChip = createSummaryChip(
+            text = "총 일정 ${selectedItems.size}",
+            iconResId = R.drawable.ic_calendar
+        )
+
+        val upcomingChip = createSummaryChip(
+            text = "다가오는 일정 ${upcomingItems.size}",
+            iconResId = R.drawable.ic_bell
+        )
+
+        binding.summaryChipContainer.addView(totalChip)
+        binding.summaryChipContainer.addView(upcomingChip)
+    }
+
+    private fun createSummaryChip(text: String, iconResId: Int): LinearLayout {
+        val context = requireContext()
+
+        return LinearLayout(context).apply {
             orientation = LinearLayout.HORIZONTAL
-            setPadding(0, 8, 0, 8)
-        }
+            gravity = Gravity.CENTER_VERTICAL
+            background = ContextCompat.getDrawable(context, R.drawable.bg_today_summary_chip)
+            setPadding(dp(14), dp(10), dp(14), dp(10))
 
-        val timeView = TextView(requireContext()).apply {
             layoutParams = LinearLayout.LayoutParams(
-                0,
                 LinearLayout.LayoutParams.WRAP_CONTENT,
-                0.3f
-            )
-            text = formatEventTime(event)
-            setTypeface(null, Typeface.BOLD)
-            setTextColor(ContextCompat.getColor(requireContext(), R.color.text_primary))
-        }
-
-        val titleView = TextView(requireContext()).apply {
-            layoutParams = LinearLayout.LayoutParams(
-                0,
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                0.7f
-            )
-            text = event.summary ?: "제목 없음"
-            setTextColor(ContextCompat.getColor(requireContext(), R.color.text_primary))
-        }
-
-        container.addView(timeView)
-        container.addView(titleView)
-
-        container.setOnClickListener {
-            val start = (event.start?.dateTime ?: event.start?.date)?.value ?: -1L
-            val end = (event.end?.dateTime ?: event.end?.date)?.value ?: -1L
-
-            val intent = Intent(requireContext(), EventDetailActivity::class.java).apply {
-                putExtra("title", event.summary ?: "제목 없음")
-                putExtra("eventId", event.id)
-                putExtra("htmlLink", event.htmlLink)
-                putExtra("startMillis", start)
-                putExtra("endMillis", end)
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                marginEnd = dp(10)
             }
-            detailLauncher.launch(intent)
-        }
 
-        return container
+            addView(ImageView(context).apply {
+                setImageResource(iconResId)
+                setColorFilter(ContextCompat.getColor(context, R.color.text_primary))
+                layoutParams = LinearLayout.LayoutParams(dp(16), dp(16)).apply {
+                    marginEnd = dp(8)
+                }
+            })
+
+            addView(TextView(context).apply {
+                this.text = text
+                textSize = 14f
+                setTypeface(null, Typeface.BOLD)
+                setTextColor(ContextCompat.getColor(context, R.color.text_primary))
+            })
+        }
+    }
+
+    private fun createEmptyStateView(): LinearLayout {
+        return LinearLayout(requireContext()).apply {
+            orientation = LinearLayout.VERTICAL
+            gravity = Gravity.CENTER_HORIZONTAL
+            background = ContextCompat.getDrawable(requireContext(), R.drawable.bg_today_empty_box)
+            setPadding(dp(20))
+
+            addView(TextView(requireContext()).apply {
+                text = "선택한 날짜에 일정이 없습니다."
+                setTypeface(null, Typeface.BOLD)
+                textSize = 16f
+                setTextColor(ContextCompat.getColor(requireContext(), R.color.text_primary))
+                gravity = Gravity.CENTER
+            })
+
+            addView(TextView(requireContext()).apply {
+                text = "+ 버튼으로 새 일정을 추가해보세요"
+                textSize = 13f
+                setTextColor(ContextCompat.getColor(requireContext(), R.color.text_secondary))
+                gravity = Gravity.CENTER
+                val lp = LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+                lp.topMargin = dp(8)
+                layoutParams = lp
+            })
+        }
+    }
+
+    private fun createScheduleListCard(items: List<ScheduleUiItem>): LinearLayout {
+        return LinearLayout(requireContext()).apply {
+            orientation = LinearLayout.VERTICAL
+            background = ContextCompat.getDrawable(requireContext(), R.drawable.bg_today_schedule_list_card)
+            setPadding(dp(14))
+
+            items.forEachIndexed { index, item ->
+                addView(createScheduleRow(item))
+
+                if (index != items.lastIndex) {
+                    addView(View(requireContext()).apply {
+                        setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.divider))
+                        layoutParams = LinearLayout.LayoutParams(
+                            ViewGroup.LayoutParams.MATCH_PARENT,
+                            dp(1)
+                        ).apply {
+                            topMargin = dp(10)
+                            bottomMargin = dp(10)
+                        }
+                    })
+                }
+            }
+        }
+    }
+
+    private fun createScheduleRow(item: ScheduleUiItem): LinearLayout {
+        val accentColor = ContextCompat.getColor(requireContext(), item.accentColorRes)
+
+        return LinearLayout(requireContext()).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            minimumHeight = dp(64)
+
+            addView(View(requireContext()).apply {
+                background = ContextCompat.getDrawable(requireContext(), R.drawable.bg_today_accent_bar)
+                background.setTint(accentColor)
+                layoutParams = LinearLayout.LayoutParams(dp(6), dp(40)).apply {
+                    marginEnd = dp(12)
+                }
+            })
+
+            addView(TextView(requireContext()).apply {
+                text = item.timeLabel
+                textSize = 16f
+                setTypeface(null, Typeface.BOLD)
+                setTextColor(accentColor)
+                layoutParams = LinearLayout.LayoutParams(dp(76), ViewGroup.LayoutParams.WRAP_CONTENT)
+            })
+
+            addView(LinearLayout(requireContext()).apply {
+                orientation = LinearLayout.VERTICAL
+                layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
+
+                addView(TextView(requireContext()).apply {
+                    text = item.title
+                    textSize = 16f
+                    setTypeface(null, Typeface.BOLD)
+                    setTextColor(ContextCompat.getColor(requireContext(), R.color.text_primary))
+                })
+
+                addView(TextView(requireContext()).apply {
+                    text = item.subtitle
+                    textSize = 13f
+                    setTextColor(ContextCompat.getColor(requireContext(), R.color.text_secondary))
+                    val lp = LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.WRAP_CONTENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                    )
+                    lp.topMargin = dp(4)
+                    layoutParams = lp
+                })
+            })
+
+            addView(TextView(requireContext()).apply {
+                text = "⋮"
+                textSize = 18f
+                setTextColor(ContextCompat.getColor(requireContext(), R.color.text_secondary))
+            })
+
+            if (item.onClick != null) {
+                isClickable = true
+                isFocusable = true
+                setOnClickListener { item.onClick.invoke() }
+            }
+        }
     }
 
     private fun formatEventTime(event: Event): String {
@@ -470,8 +675,6 @@ class HomeFragment : Fragment() {
             "종일"
         }
     }
-
-    // -------------------- 로컬 일정 + BottomSheet --------------------
 
     private fun showScheduleBottomSheet() {
         val bottomSheet = ScheduleBottomSheetFragment()
@@ -490,14 +693,12 @@ class HomeFragment : Fragment() {
                 isAlarmOn: Boolean,
                 alarmTime: String?
             ) {
-                // 로컬 일정은 "시작 날짜 기준"으로만 저장
                 val calStart = JavaCalendar.getInstance().apply {
                     set(startYear, startMonth, startDay, 0, 0, 0)
                     set(JavaCalendar.MILLISECOND, 0)
                 }
                 val dateMillis = calStart.timeInMillis
 
-                // ✅ 구글 계정이 연결되어 있으면 → 구글 캘린더에만 추가
                 if (calendarService != null) {
                     addEventToGoogleCalendar(
                         title = title,
@@ -514,7 +715,6 @@ class HomeFragment : Fragment() {
                     return
                 }
 
-                // ✅ 구글 계정이 없으면 → 로컬 일정으로만 관리
                 val list = schedulesByDate.getOrPut(dateMillis) { mutableListOf() }
                 list.add(Schedule(title, startTime ?: "시간 미지정"))
 
@@ -529,55 +729,32 @@ class HomeFragment : Fragment() {
         bottomSheet.show(parentFragmentManager, "ScheduleBottomSheet")
     }
 
-    // 로컬 일정 리스트 표시 (구글 계정이 없을 때만 사용)
     private fun renderSchedulesForDate(dateMillis: Long) {
-        val b = _binding ?: return
-        val list = schedulesByDate[dateMillis]
-
-        b.calendarEventsContainer.removeAllViews()
-
-        if (list.isNullOrEmpty()) {
-            b.calendarEventsContainer.addView(
-                TextView(requireContext()).apply {
-                    text = "선택한 날짜에 일정이 없습니다."
-                    setTextColor(ContextCompat.getColor(requireContext(), R.color.text_secondary))
-                }
-            )
-            return
-        }
-
-        list.forEach { schedule ->
-            val row = LinearLayout(requireContext()).apply {
-                orientation = LinearLayout.HORIZONTAL
-                setPadding(0, 8, 0, 8)
+        viewLifecycleOwner.lifecycleScope.launch {
+            val assignments = withContext(Dispatchers.IO) {
+                loadAssignmentsForDate(dateMillis)
             }
 
-            row.addView(TextView(requireContext()).apply {
-                text = schedule.time
-                setTypeface(null, Typeface.BOLD)
-                setTextColor(ContextCompat.getColor(requireContext(), R.color.text_primary))
-                layoutParams = LinearLayout.LayoutParams(
-                    0,
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    0.3f
-                )
-            })
+            val upcomingAssignments = withContext(Dispatchers.IO) {
+                loadUpcomingAssignmentsAfterSelectedDay()
+            }
 
-            row.addView(TextView(requireContext()).apply {
-                text = schedule.title
-                setTextColor(ContextCompat.getColor(requireContext(), R.color.text_primary))
-                layoutParams = LinearLayout.LayoutParams(
-                    0,
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    0.7f
-                )
-            })
+            val locals = schedulesByDate[dateMillis].orEmpty().map {
+                buildLocalUiItem(dateMillis, it)
+            }
 
-            b.calendarEventsContainer.addView(row)
+            val selectedItems = mutableListOf<ScheduleUiItem>()
+            selectedItems.addAll(assignments.map { buildAssignmentUiItem(it, true) })
+            selectedItems.addAll(locals)
+
+            val upcomingItems = upcomingAssignments.map {
+                buildAssignmentUiItem(it, false)
+            }
+
+            renderScheduleItems(selectedItems, upcomingItems)
         }
     }
 
-    // 시간 문자열 "HH:mm" → Pair(h, m) 로 변환
     private fun parseTime(time: String?): Pair<Int, Int>? {
         if (time.isNullOrBlank()) return null
         val parts = time.split(":")
@@ -605,9 +782,6 @@ class HomeFragment : Fragment() {
             return
         }
 
-        val koreaTimeZone = java.util.TimeZone.getTimeZone("Asia/Seoul")
-
-        // 시작 시간
         val (sh, sm) = parseTime(startTime) ?: (9 to 0)
         val calStart = JavaCalendar.getInstance(koreaTimeZone).apply {
             set(startYear, startMonth, startDay)
@@ -617,7 +791,6 @@ class HomeFragment : Fragment() {
             set(JavaCalendar.MILLISECOND, 0)
         }
 
-        // 종료 시간
         val calEnd = JavaCalendar.getInstance(koreaTimeZone).apply {
             set(endYear, endMonth, endDay)
 
@@ -685,10 +858,10 @@ class HomeFragment : Fragment() {
         }
     }
 
-    // -------------------- ✅ 과제(Assignment) 관련 추가 --------------------
-
     private fun selectedDateString(millis: Long): String {
-        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).apply {
+            timeZone = koreaTimeZone
+        }
         return sdf.format(Date(millis))
     }
 
@@ -698,95 +871,36 @@ class HomeFragment : Fragment() {
         return dao.getByDueDate(dateStr)
     }
 
-    /**
-     * ✅ 여기가 핵심 수정:
-     * - 과제 행을 눌렀을 때 EventDetailActivity로 이동하도록 setOnClickListener 추가
-     */
-    private fun createAssignmentRow(a: AssignmentEntity): LinearLayout {
-        val container = LinearLayout(requireContext()).apply {
-            orientation = LinearLayout.HORIZONTAL
-            setPadding(0, 8, 0, 8)
-            isClickable = true
-            isFocusable = true
-        }
-
-        val timeView = TextView(requireContext()).apply {
-            layoutParams = LinearLayout.LayoutParams(
-                0,
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                0.3f
-            )
-            text = a.startTime ?: "09:00"
-            setTypeface(null, Typeface.BOLD)
-            setTextColor(ContextCompat.getColor(requireContext(), R.color.text_primary))
-        }
-
-        val titleView = TextView(requireContext()).apply {
-            layoutParams = LinearLayout.LayoutParams(
-                0,
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                0.7f
-            )
-
-            val label = if (a.type == "팀 프로젝트") "[팀 과제]" else "[개인 과제]"
-            text = "$label ${a.title}"
-
-            setTextColor(ContextCompat.getColor(requireContext(), R.color.text_primary))
-        }
-
-        container.addView(timeView)
-        container.addView(titleView)
-
-        container.setOnClickListener {
-            val label = if (a.type == "팀 프로젝트") "[팀 과제]" else "[개인 과제]"
-
-            val startMillis = assignmentDateTimeToMillis(a.dueDate, a.startTime ?: "09:00")
-            val endMillis = assignmentDateTimeToMillis(a.dueDate, a.endTime ?: "10:00")
-
-            val intent = Intent(requireContext(), EventDetailActivity::class.java).apply {
-                putExtra("title", "$label ${a.title}")
-                putExtra("eventId", "assignment:${a.id}")
-                putExtra("htmlLink", "")
-                putExtra("startMillis", startMillis)
-                putExtra("endMillis", endMillis)
-                putExtra("isAssignment", true)
-                putExtra("assignmentId", a.id)
-            }
-            detailLauncher.launch(intent)
-        }
-
-        return container
+    private suspend fun loadAssignmentsForDate(dateMillis: Long): List<AssignmentEntity> {
+        val dateStr = selectedDateString(dateMillis)
+        val dao = AppDatabase.getDatabase(requireContext()).assignmentDao()
+        return dao.getByDueDate(dateStr)
     }
 
-    // ✅ dueDate("yyyy-MM-dd") -> 해당 날짜 00:00 millis 로 변환
-    private fun dueDateToDayStartMillis(dueDate: String): Long {
-        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        val parsed = sdf.parse(dueDate) ?: Date()
-        val cal = JavaCalendar.getInstance().apply {
-            time = parsed
-            set(JavaCalendar.HOUR_OF_DAY, 0)
-            set(JavaCalendar.MINUTE, 0)
-            set(JavaCalendar.SECOND, 0)
-            set(JavaCalendar.MILLISECOND, 0)
-        }
-        return cal.timeInMillis
-    }
+    private suspend fun loadUpcomingAssignmentsAfterSelectedDay(): List<AssignmentEntity> {
+        val dao = AppDatabase.getDatabase(requireContext()).assignmentDao()
+        val allAssignments = dao.getAll()
+        val endMillis = selectedDayEndMillis()
 
-    // -------------------- 공통 --------------------
+        return allAssignments.filter { assignment ->
+            val startMillis = assignmentDateTimeToMillis(
+                assignment.dueDate,
+                assignment.startTime ?: "09:00"
+            )
+            startMillis > endMillis
+        }
+    }
 
     private fun showStatus(message: String) {
-        _binding?.let { b ->
-            b.statusTextView.text = message
-        }
+        _binding?.statusTextView?.text = message
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
-    private fun assignmentDateTimeToMillis(dueDate: String, hhmm: String): Long {
-        val koreaTimeZone = java.util.TimeZone.getTimeZone("Asia/Seoul")
 
+    private fun assignmentDateTimeToMillis(dueDate: String, hhmm: String): Long {
         val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).apply {
             timeZone = koreaTimeZone
         }
@@ -806,5 +920,21 @@ class HomeFragment : Fragment() {
         }
 
         return cal.timeInMillis
+    }
+
+    private fun localScheduleDateTimeToMillis(dateMillis: Long, time: String?): Long {
+        val cal = JavaCalendar.getInstance(koreaTimeZone).apply {
+            timeInMillis = dateMillis
+        }
+        val parsed = parseTime(time)
+        cal.set(JavaCalendar.HOUR_OF_DAY, parsed?.first ?: 23)
+        cal.set(JavaCalendar.MINUTE, parsed?.second ?: 59)
+        cal.set(JavaCalendar.SECOND, 0)
+        cal.set(JavaCalendar.MILLISECOND, 0)
+        return cal.timeInMillis
+    }
+
+    private fun dp(value: Int): Int {
+        return (value * resources.displayMetrics.density).toInt()
     }
 }

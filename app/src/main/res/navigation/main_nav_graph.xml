@@ -17,18 +17,32 @@
     <fragment
         android:id="@+id/notesFragment"
         android:name="com.example.myapplication.NotesFragment"
-        android:label="필기요약">
-    <!-- 요약 파일 관리 화면으로 이동하는 액션 -->
-    <action
-        android:id="@+id/action_notesFragment_to_manageFilesFragment"
-        app:destination="@id/manageFilesFragment" />
+        android:label="AI요약">
 
-</fragment>
+        <action
+            android:id="@+id/action_notesFragment_to_manageFilesFragment"
+            app:destination="@id/manageFilesFragment" />
+    </fragment>
 
-    <fragment
-        android:id="@+id/analyticsFragment"
-        android:name="com.example.myapplication.AnalyticsFragment"
-        android:label="학습 분석" />
+    <navigation
+        android:id="@+id/analytics_graph"
+        app:startDestination="@id/analyticsFragment">
+
+        <fragment
+            android:id="@+id/analyticsFragment"
+            android:name="com.example.myapplication.AnalyticsFragment"
+            android:label="학습 분석">
+
+            <action
+                android:id="@+id/action_analyticsFragment_to_quizLearnedFragment"
+                app:destination="@id/quizLearnedFragment" />
+        </fragment>
+
+        <fragment
+            android:id="@+id/quizLearnedFragment"
+            android:name="com.example.myapplication.QuizLearnedFragment"
+            android:label="학습된 퀴즈" />
+    </navigation>
 
     <fragment
         android:id="@+id/teamProjectFragment"

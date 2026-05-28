@@ -33,17 +33,13 @@ class ManageFilesDialogFragment : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // 바텀시트를 펼친 상태로 시작
         (dialog as? BottomSheetDialog)?.behavior?.state = BottomSheetBehavior.STATE_EXPANDED
 
-        // 닫기 버튼
         val btnClose: ImageButton = view.findViewById(R.id.btnBackManageFiles)
         btnClose.setOnClickListener { dismiss() }
 
-        // 빈 목록 안내 텍스트
         emptyText = view.findViewById(R.id.tvEmptyFiles)
 
-        // RecyclerView 세팅
         recyclerView = view.findViewById(R.id.rvManagedFiles)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
@@ -55,7 +51,6 @@ class ManageFilesDialogFragment : BottomSheetDialogFragment() {
         )
         recyclerView.adapter = adapter
 
-        // 파일 목록 로드
         loadFiles()
     }
 
@@ -83,25 +78,42 @@ class ManageFilesDialogFragment : BottomSheetDialogFragment() {
     }
 
     private fun showDeleteConfirmDialog(file: File, position: Int) {
-        AlertDialog.Builder(requireContext())
-            .setTitle("파일 삭제")
-            .setMessage("'${file.name}' 파일을 삭제하시겠습니까?")
-            .setPositiveButton("삭제") { _, _ ->
-                if (file.delete()) {
-                    fileList.removeAt(position)
-                    adapter.notifyItemRemoved(position)
-                    adapter.notifyItemRangeChanged(position, fileList.size)
-                    updateEmptyState()
-                    Toast.makeText(requireContext(), "파일이 삭제되었습니다.", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(requireContext(), "파일 삭제에 실패했습니다.", Toast.LENGTH_SHORT).show()
-                }
+        val dialogView = LayoutInflater.from(requireContext())
+            .inflate(R.layout.dialog_delete_member, null)
+
+        val textDeleteTitle = dialogView.findViewById<TextView>(R.id.textDeleteTitle)
+        val textDeleteMessage = dialogView.findViewById<TextView>(R.id.textDeleteMessage)
+        val btnCancelDelete = dialogView.findViewById<TextView>(R.id.btnCancelDelete)
+        val btnConfirmDelete = dialogView.findViewById<TextView>(R.id.btnConfirmDelete)
+
+        textDeleteTitle.text = "파일 삭제"
+        textDeleteMessage.text = "'${file.name}' 파일을 삭제할까요?"
+
+        val dialog = AlertDialog.Builder(requireContext())
+            .setView(dialogView)
+            .create()
+
+        dialog.show()
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        btnCancelDelete.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        btnConfirmDelete.setOnClickListener {
+            if (file.delete()) {
+                fileList.removeAt(position)
+                adapter.notifyItemRemoved(position)
+                adapter.notifyItemRangeChanged(position, fileList.size)
+                updateEmptyState()
+                Toast.makeText(requireContext(), "파일이 삭제되었습니다.", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(requireContext(), "파일 삭제에 실패했습니다.", Toast.LENGTH_SHORT).show()
             }
-            .setNegativeButton("취소", null)
-            .show()
+            dialog.dismiss()
+        }
     }
 
-    // ───────── RecyclerView 어댑터 ─────────
     private class FileListAdapter(
         private val files: MutableList<File>,
         private val onDeleteClick: (File, Int) -> Unit

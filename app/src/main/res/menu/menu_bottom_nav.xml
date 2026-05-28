@@ -1,19 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
         android:id="@+id/homeFragment"
-        android:title="일정" />
+        android:title="일정"
+        android:icon="@android:color/transparent" />
 
     <item
         android:id="@+id/assignmentFragment"
-        android:title="과제" />
+        android:title="과제"
+        android:icon="@android:color/transparent" />
 
     <item
         android:id="@+id/notesFragment"
-        android:title="필기요약" />
+        android:title="AI 요약"
+        android:icon="@android:color/transparent" />
 
     <item
-        android:id="@+id/analyticsFragment"
-        android:title="학습 분석" />
+        android:id="@+id/analytics_graph"
+        android:title="학습 분석"
+        android:icon="@android:color/transparent" />
 
 </menu>

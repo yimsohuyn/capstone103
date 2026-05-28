@@ -1,72 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/itemRoot"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
     android:orientation="horizontal"
     android:gravity="center_vertical"
-    android:paddingVertical="12dp"
-    android:paddingHorizontal="8dp"
-    android:background="?attr/selectableItemBackground"
-    android:clickable="true"
-    android:focusable="true">
+    android:padding="16dp"
+    android:background="@drawable/bg_today_schedule_list_card">
 
-    <!-- 선택 모드용 체크박스 (기본 숨김) -->
     <CheckBox
         android:id="@+id/cbSelect"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        android:layout_marginEnd="8dp"
-        android:clickable="false"
-        android:focusable="false" />
+        android:layout_marginEnd="10dp" />
 
-    <!-- 폴더/파일 아이콘 (코드에서 동적으로 변경) -->
-    <ImageView
-        android:id="@+id/ivFileIcon"
-        android:layout_width="28dp"
-        android:layout_height="28dp"
-        android:src="@drawable/outline_files_24"
-        app:tint="@color/accent_teal" />
+    <LinearLayout
+        android:layout_width="46dp"
+        android:layout_height="46dp"
+        android:gravity="center"
+        android:background="@drawable/bg_today_summary_chip">
 
-    <!-- 파일 이름 + 크기/수정일 -->
+        <ImageView
+            android:id="@+id/ivFileIcon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/outline_files_24" />
+    </LinearLayout>
+
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:orientation="vertical"
-        android:layout_marginStart="12dp">
+        android:layout_marginStart="14dp"
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/tvFileName"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="파일명"
+            android:text="파일 이름"
             android:textColor="@color/text_primary"
-            android:textSize="15sp"
+            android:textSize="17sp"
+            android:textStyle="bold"
             android:maxLines="1"
-            android:ellipsize="middle" />
+            android:ellipsize="end" />
 
-        <!-- 파일: 크기 + 수정일 / 폴더: 항목 수 -->
         <TextView
             android:id="@+id/tvFileInfo"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text=""
+            android:layout_marginTop="4dp"
+            android:text="파일 정보"
             android:textColor="@color/text_secondary"
-            android:textSize="12sp"
-            android:layout_marginTop="2dp" />
+            android:textSize="13sp"
+            android:maxLines="1"
+            android:ellipsize="end" />
     </LinearLayout>
 
-    <!-- 3-dot 메뉴 버튼 (개별 항목 이름변경/이동/삭제) -->
     <ImageButton
         android:id="@+id/btnItemMenu"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:src="@drawable/ic_more_vert"
-        app:tint="@color/icon_secondary"
-        android:contentDescription="메뉴" />
+        android:src="@android:drawable/ic_menu_more"
+        android:contentDescription="메뉴"
+        app:tint="@color/text_secondary" />
 
 </LinearLayout>

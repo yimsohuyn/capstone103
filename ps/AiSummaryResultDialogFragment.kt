@@ -103,7 +103,7 @@ class AiSummaryResultDialogFragment : DialogFragment() {
     private fun shareSummary() {
         val shareIntent = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
-            putExtra(Intent.EXTRA_SUBJECT, "AI 필기 요약 결과")
+            putExtra(Intent.EXTRA_SUBJECT, "AI 요약 결과")
             putExtra(Intent.EXTRA_TEXT, summaryText)
         }
         startActivity(Intent.createChooser(shareIntent, "요약 공유"))

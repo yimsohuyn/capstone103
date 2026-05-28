@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>팀 초대</title>
+    <style>
+        body {
+          margin: 0;
+          font-family: Arial, sans-serif;
+          background: #121212;
+          color: #ffffff;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          min-height: 100vh;
+        }
+        .card {
+          width: 90%;
+          max-width: 420px;
+          background: #1e1e1e;
+          border-radius: 16px;
+          padding: 24px;
+          box-sizing: border-box;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+          text-align: center;
+        }
+        h1 {
+          font-size: 24px;
+          margin-bottom: 12px;
+        }
+        p {
+          color: #cfcfcf;
+          line-height: 1.5;
+          margin-bottom: 16px;
+        }
+        .team-box {
+          background: #2a2a2a;
+          border-radius: 12px;
+          padding: 14px;
+          margin-bottom: 20px;
+          word-break: break-all;
+          white-space: pre-line;
+          color: #9fb0ff;
+          font-weight: bold;
+        }
+        button {
+          width: 100%;
+          border: none;
+          border-radius: 12px;
+          padding: 14px;
+          font-size: 16px;
+          cursor: pointer;
+          margin-bottom: 12px;
+        }
+        .primary {
+          background: #4b57d1;
+          color: white;
+        }
+        .secondary {
+          background: #2f2f2f;
+          color: white;
+        }
+        .hint {
+          font-size: 13px;
+          color: #a0a0a0;
+          margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h1>팀 초대</h1>
+    <p>초대받은 프로젝트에 참가하려면 아래 버튼을 눌러 주세요.</p>
+
+    <div class="team-box" id="teamIdBox">불러오는 중...</div>
+
+    <button class="primary" id="openAppBtn">앱에서 열기</button>
+    <button class="secondary" id="openWebBtn">웹에서 수락하고 보기</button>
+    <button class="secondary" id="copyBtn">초대 링크 복사</button>
+
+    <div class="hint">
+        앱이 없으면 웹에서 프로젝트 내용을 확인할 수 있습니다.
+    </div>
+</div>
+
+<script>
+    const params = new URLSearchParams(window.location.search);
+    const teamId = params.get("teamId") || "";
+    const assignmentRemoteId = params.get("assignmentRemoteId") || "";
+
+    const teamBox = document.getElementById("teamIdBox");
+
+    if (!teamId || !assignmentRemoteId) {
+      teamBox.textContent = "유효하지 않은 초대 링크입니다.";
+    } else {
+      teamBox.textContent = `teamId: ${teamId}\nprojectId: ${assignmentRemoteId}`;
+    }
+
+    document.getElementById("openAppBtn").addEventListener("click", () => {
+      if (!teamId || !assignmentRemoteId) {
+        alert("유효하지 않은 초대 링크입니다.");
+        return;
+      }
+
+      window.location.href =
+        `studywithme://invite?teamId=${encodeURIComponent(teamId)}&assignmentRemoteId=${encodeURIComponent(assignmentRemoteId)}`;
+    });
+
+    document.getElementById("openWebBtn").addEventListener("click", () => {
+      if (!teamId || !assignmentRemoteId) {
+        alert("유효하지 않은 초대 링크입니다.");
+        return;
+      }
+
+      localStorage.setItem(
+        `accepted_${teamId}_${assignmentRemoteId}`,
+        "true"
+      );
+
+      window.location.href =
+        `project.html?teamId=${encodeURIComponent(teamId)}&assignmentRemoteId=${encodeURIComponent(assignmentRemoteId)}`;
+    });
+
+    document.getElementById("copyBtn").addEventListener("click", async () => {
+      try {
+        if (!teamId || !assignmentRemoteId) {
+          alert("복사할 수 있는 초대 링크가 없습니다.");
+          return;
+        }
+
+        const fullLink =
+          `${window.location.origin}${window.location.pathname}?teamId=${encodeURIComponent(teamId)}&assignmentRemoteId=${encodeURIComponent(assignmentRemoteId)}`;
+
+        await navigator.clipboard.writeText(fullLink);
+        alert("초대 링크가 복사되었습니다.");
+      } catch (e) {
+        alert("복사에 실패했습니다.");
+      }
+    });
+</script>
+</body>
+</html>

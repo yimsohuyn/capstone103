@@ -11,7 +11,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="AI 필기 요약"
+        android:text="AI 요약"
         android:textSize="20sp"
         android:textStyle="bold"
         android:textColor="@color/text_primary"

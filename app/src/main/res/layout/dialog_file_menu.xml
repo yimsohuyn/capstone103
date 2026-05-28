@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="24dp"
+    android:background="@android:color/transparent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:background="@drawable/bg_delete_member_dialog">
+
+        <TextView
+            android:id="@+id/textMenuTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="파일명"
+            android:textColor="@android:color/white"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:layout_marginBottom="20dp" />
+
+        <TextView
+            android:id="@+id/btnMenuRename"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="이름 변경"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:paddingVertical="14dp" />
+
+        <TextView
+            android:id="@+id/btnMenuMove"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="이동"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:paddingVertical="14dp" />
+
+        <TextView
+            android:id="@+id/btnMenuDelete"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="삭제"
+            android:textColor="#FF6B6B"
+            android:textSize="16sp"
+            android:paddingTop="14dp"
+            android:paddingBottom="4dp" />
+
+    </LinearLayout>
+
+</FrameLayout>

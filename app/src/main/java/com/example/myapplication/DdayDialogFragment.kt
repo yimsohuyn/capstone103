@@ -4,8 +4,6 @@ import android.app.Dialog
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -26,55 +24,48 @@ class DdayDialogFragment : DialogFragment() {
     private var recyclerView: RecyclerView? = null
     private var tvEmpty: TextView? = null
     private var tvTitle: TextView? = null
+    private var btnClose: TextView? = null
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val builder = MaterialAlertDialogBuilder(requireContext())
         val inflater = requireActivity().layoutInflater
-        val view = inflater.inflate(R.layout.dday_dialog, null)  // xml 이름 확인
+        val view = inflater.inflate(R.layout.dday_dialog, null)
 
         recyclerView = view.findViewById(R.id.rvEvents)
         tvEmpty = view.findViewById(R.id.tvEmpty)
         tvTitle = view.findViewById(R.id.tvDialogTitle)
+        btnClose = view.findViewById(R.id.btnCloseDialog)
 
         recyclerView?.layoutManager = LinearLayoutManager(requireContext())
 
+        val dialog = MaterialAlertDialogBuilder(requireContext())
+            .setView(view)
+            .create()
+
+        dialog.setOnShowListener {
+            dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        }
+
+        btnClose?.setOnClickListener {
+            dialog.dismiss()
+        }
+
         val service = calendarService
         if (service == null) {
-            tvTitle?.text = "구글 캘린더가 연결되지 않았습니다."
+            tvTitle?.text = "다가오는 일정 D-Day"
+            tvEmpty?.text = "구글 캘린더가 연결되지 않았습니다."
             tvEmpty?.visibility = View.VISIBLE
             recyclerView?.visibility = View.GONE
         } else {
-            // 처음 열릴 때 한 번 로딩
             loadAndRenderEvents()
         }
 
-        builder.setView(view)
-        builder.setNegativeButton("닫기") { dialog, _ ->
-            dialog.dismiss()
-        }
-        
-        val dialog = builder.create()
-        
-        // 다이얼로그 window 배경색 설정
-        dialog.window?.setBackgroundDrawableResource(R.color.dialog_background)
-        
-        // 다이얼로그가 생성된 후 버튼 색상 설정
-        dialog.setOnShowListener {
-            dialog.getButton(AlertDialog.BUTTON_NEGATIVE)?.apply {
-                setTextColor(ContextCompat.getColor(requireContext(), R.color.onSecondary))
-            }
-        }
-        
         return dialog
     }
-
-    //HomeFragment 에서 디테일 화면 다녀온 후 호출/ 팝업 리스트를 다시 채우는 함수
 
     fun refreshFromParent() {
         loadAndRenderEvents()
     }
 
-    // 실제로 구글 캘린더에서 이벤트 가져와서 RecyclerView 에 반영
     private fun loadAndRenderEvents() {
         val service = calendarService ?: return
 
@@ -87,6 +78,7 @@ class DdayDialogFragment : DialogFragment() {
                 if (!isAdded || dialog == null || dialog?.isShowing != true) return@launch
 
                 if (events.isEmpty()) {
+                    tvEmpty?.text = "표시할 일정이 없습니다."
                     tvEmpty?.visibility = View.VISIBLE
                     recyclerView?.visibility = View.GONE
                 } else {
@@ -99,14 +91,14 @@ class DdayDialogFragment : DialogFragment() {
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                tvTitle?.text = "D-Day 로딩 중 오류가 발생했습니다."
+                tvTitle?.text = "다가오는 일정 D-Day"
+                tvEmpty?.text = "D-Day 로딩 중 오류가 발생했습니다."
                 tvEmpty?.visibility = View.VISIBLE
                 recyclerView?.visibility = View.GONE
             }
         }
     }
 
-    // 오늘 ~ 30일 뒤까지의 일정을 DdayEvent 로 변환
     private fun loadUpcomingEvents(service: Calendar): List<DdayEvent> {
         val now = System.currentTimeMillis()
         val in30Days = now + 30L * 24 * 60 * 60 * 1000L

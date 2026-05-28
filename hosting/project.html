@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>프로젝트 상세</title>
+    <style>
+        body {
+          margin: 0;
+          font-family: Arial, sans-serif;
+          background: #121212;
+          color: #ffffff;
+          min-height: 100vh;
+        }
+        .wrap {
+          width: 92%;
+          max-width: 800px;
+          margin: 24px auto;
+        }
+        .card {
+          background: #1e1e1e;
+          border-radius: 16px;
+          padding: 20px;
+          margin-bottom: 16px;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+        }
+        h1 {
+          font-size: 24px;
+          margin: 0 0 8px;
+        }
+        h2 {
+          font-size: 18px;
+          margin: 0 0 14px;
+        }
+        p {
+          color: #d0d0d0;
+          margin: 8px 0;
+          line-height: 1.5;
+        }
+        .muted {
+          color: #aaaaaa;
+        }
+        .progress-bar {
+          width: 100%;
+          height: 12px;
+          background: #2d2d2d;
+          border-radius: 999px;
+          overflow: hidden;
+          margin-top: 10px;
+        }
+        .progress-fill {
+          height: 100%;
+          background: #4b57d1;
+          width: 0%;
+        }
+        ul {
+          padding-left: 20px;
+          margin: 0;
+        }
+        li {
+          margin: 8px 0;
+          color: #e3e3e3;
+        }
+        a.file-link {
+          color: #9fb0ff;
+          text-decoration: none;
+        }
+        a.file-link:hover {
+          text-decoration: underline;
+        }
+        .badge {
+          display: inline-block;
+          padding: 6px 10px;
+          border-radius: 999px;
+          background: #2a2a2a;
+          color: #cfcfcf;
+          font-size: 13px;
+          margin-top: 6px;
+        }
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <div class="card">
+        <h1 id="title">불러오는 중...</h1>
+        <p id="dueDate" class="muted">마감일: -</p>
+        <p id="assignee" class="muted">담당자: -</p>
+        <div class="badge">웹에서는 보기만 가능합니다</div>
+    </div>
+
+    <div class="card">
+        <h2>팀원</h2>
+        <ul id="memberList"></ul>
+        <p id="memberEmpty" class="muted">등록된 팀원이 없습니다.</p>
+    </div>
+
+    <div class="card">
+        <h2>진행률</h2>
+        <p id="progressText">진행률: 0% (0/5)</p>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <ul id="checkList"></ul>
+    </div>
+
+    <div class="card">
+        <h2>팀 회의</h2>
+        <ul id="meetingList"></ul>
+        <p id="meetingEmpty" class="muted">등록된 회의가 없습니다.</p>
+    </div>
+
+    <div class="card">
+        <h2>프로젝트 파일</h2>
+        <ul id="fileList"></ul>
+        <p id="fileEmpty" class="muted">등록된 파일이 없습니다.</p>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import {
+      getFirestore,
+      doc,
+      getDoc,
+      collection,
+      getDocs
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    // ✅ 여기만 네 Firebase 웹 설정값으로 바꿔
+    const firebaseConfig = {
+      apiKey: "AIzaSyAy5qeYzuVWrDczY-OaAUm83rnra8fVfOg",
+      authDomain: "capstone103-d14a5.firebaseapp.com",
+      projectId: "capstone103-d14a5",
+      storageBucket: "capstone103-d14a5.firebasestorage.app",
+      messagingSenderId: "775290494911",
+      appId: "1:775290494911:web:8a569509ce6a1f8b2e4b0a"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const params = new URLSearchParams(window.location.search);
+    const teamId = params.get("teamId") || "";
+    const assignmentRemoteId = params.get("assignmentRemoteId") || "";
+
+    const accepted = localStorage.getItem(`accepted_${teamId}_${assignmentRemoteId}`) === "true";
+
+    if (!teamId || !assignmentRemoteId || !accepted) {
+      document.body.innerHTML = `
+        <div style="padding:32px; color:white; background:#121212; font-family:Arial,sans-serif;">
+          <h2>접근할 수 없습니다.</h2>
+          <p>초대 링크를 통해 수락한 프로젝트만 볼 수 있습니다.</p>
+        </div>
+      `;
+      throw new Error("접근 불가");
+    }
+
+    const titleEl = document.getElementById("title");
+    const dueDateEl = document.getElementById("dueDate");
+    const assigneeEl = document.getElementById("assignee");
+
+    const memberListEl = document.getElementById("memberList");
+    const memberEmptyEl = document.getElementById("memberEmpty");
+
+    const progressTextEl = document.getElementById("progressText");
+    const progressFillEl = document.getElementById("progressFill");
+    const checkListEl = document.getElementById("checkList");
+
+    const meetingListEl = document.getElementById("meetingList");
+    const meetingEmptyEl = document.getElementById("meetingEmpty");
+
+    const fileListEl = document.getElementById("fileList");
+    const fileEmptyEl = document.getElementById("fileEmpty");
+
+    function setListOrEmpty(listEl, emptyEl, items) {
+      listEl.innerHTML = "";
+      if (!items || items.length === 0) {
+        emptyEl.style.display = "block";
+        return;
+      }
+      emptyEl.style.display = "none";
+      items.forEach(item => listEl.appendChild(item));
+    }
+
+    async function loadProject() {
+      const projectRef = doc(db, "teams", teamId, "assignments", assignmentRemoteId);
+      const projectSnap = await getDoc(projectRef);
+
+      if (!projectSnap.exists()) {
+        titleEl.textContent = "프로젝트를 찾을 수 없습니다.";
+        return;
+      }
+
+      const data = projectSnap.data();
+
+      titleEl.textContent = data.title || "제목 없음";
+      dueDateEl.textContent = `마감일: ${data.dueDate || "-"}`;
+      assigneeEl.textContent = `담당자: ${data.assignee || "-"}`;
+
+      const checks = [
+        { key: "checkTopic", label: "주제 선정 완료" },
+        { key: "checkResearch", label: "자료 조사 진행" },
+        { key: "checkMeeting", label: "팀 회의 진행" },
+        { key: "checkSlides", label: "발표 자료(PPT) 작성" },
+        { key: "checkPractice", label: "발표 연습 완료" }
+      ];
+
+      let done = 0;
+      checkListEl.innerHTML = "";
+
+      checks.forEach(item => {
+        const checked = !!data[item.key];
+        if (checked) done++;
+
+        const li = document.createElement("li");
+        li.textContent = `${checked ? "✔" : "☐"} ${item.label}`;
+        checkListEl.appendChild(li);
+      });
+
+      const percent = Math.floor((done * 100) / 5);
+      progressTextEl.textContent = `진행률: ${percent}% (${done}/5)`;
+      progressFillEl.style.width = `${percent}%`;
+
+      const membersSnap = await getDocs(collection(db, "teams", teamId, "assignments", assignmentRemoteId, "members"));
+      const memberItems = [];
+      membersSnap.forEach(docSnap => {
+        const member = docSnap.data();
+        const name = member.name || "이름없음";
+
+        // 담당자는 화면에서 숨김
+        if ((data.assignee || "").trim() === name.trim()) return;
+
+        const li = document.createElement("li");
+        li.textContent = name;
+        memberItems.push(li);
+      });
+      setListOrEmpty(memberListEl, memberEmptyEl, memberItems);
+
+      const meetingsSnap = await getDocs(collection(db, "teams", teamId, "assignments", assignmentRemoteId, "meetings"));
+      const meetingItems = [];
+      meetingsSnap.forEach(docSnap => {
+        const meeting = docSnap.data();
+        const li = document.createElement("li");
+        const memo = meeting.memo ? ` - ${meeting.memo}` : "";
+        li.textContent = `${meeting.datetime || ""}${memo}`;
+        meetingItems.push(li);
+      });
+      setListOrEmpty(meetingListEl, meetingEmptyEl, meetingItems);
+
+      const filesSnap = await getDocs(collection(db, "teams", teamId, "assignments", assignmentRemoteId, "files"));
+      const fileItems = [];
+      filesSnap.forEach(docSnap => {
+        const file = docSnap.data();
+        const li = document.createElement("li");
+
+        const a = document.createElement("a");
+        a.className = "file-link";
+        a.href = file.fileUri || "#";
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+        a.textContent = file.fileName || "파일";
+
+        li.appendChild(a);
+        fileItems.push(li);
+      });
+      setListOrEmpty(fileListEl, fileEmptyEl, fileItems);
+    }
+
+    loadProject().catch(err => {
+      console.error(err);
+      titleEl.textContent = "프로젝트를 불러오는 중 오류가 발생했습니다.";
+    });
+</script>
+</body>
+</html>

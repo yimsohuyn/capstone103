@@ -1,4 +1,4 @@
-package com.example.myapplication.data
+package com.example.myapplication
 
 import androidx.room.Dao
 import androidx.room.Insert
@@ -29,5 +29,9 @@ interface AssignmentDao {
     @Query("SELECT * FROM assignments WHERE id = :id LIMIT 1")
     suspend fun getById(id: Int): AssignmentEntity?
 
+    @Query("SELECT * FROM assignments WHERE remoteId = :remoteId LIMIT 1")
+    suspend fun getByRemoteId(remoteId: String): AssignmentEntity?
 
+    @Query("SELECT * FROM assignments WHERE teamId = :teamId ORDER BY dueDate ASC")
+    suspend fun getByTeamId(teamId: String): List<AssignmentEntity>
 }
