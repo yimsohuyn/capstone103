@@ -134,4 +134,10 @@
     <color name="result_error">#FF5E5E</color>
     <color name="result_success">#4ADE80</color>
 
+    <color name="wrong_note_surface">#2F2F2F</color>
+    <color name="wrong_note_border">#5A5A5A</color>
+    <color name="wrong_note_title">#FFFFFF</color>
+    <color name="wrong_note_content">#E2E2E2</color>
+    <color name="wrong_note_action">#F2F2F2</color>
+
 </resources>

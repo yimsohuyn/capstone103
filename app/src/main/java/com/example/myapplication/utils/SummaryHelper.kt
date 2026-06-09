@@ -93,20 +93,14 @@ object SummaryHelper {
     }
 
     /**
-     * userPrompt 유무에 따라 적절한 AI 모델로 요약을 수행한다.
-     * - userPrompt가 비어있으면 → 로컬 파인튜닝 모델 (Qwen3.5-2B) 사용
-     * - userPrompt가 있으면 → Gemini API 사용
+     * Gemini API를 사용하여 요약을 수행한다.
      * @param context Android Context (assets 프롬프트 파일 읽기용)
      * @param extractedText OCR 또는 파일에서 추출된 원본 텍스트
      * @param userPrompt 사용자가 추가로 입력한 요약 방향 (비어있을 수 있음)
      * @return AI가 생성한 요약 텍스트
      */
     suspend fun summarize(context: Context, extractedText: String, userPrompt: String): String {
-        return if (userPrompt.isBlank()) {
-            summarizeWithLocalModel(extractedText)
-        } else {
-            summarizeWithGemini(context, extractedText, userPrompt)
-        }
+        return summarizeWithGemini(context, extractedText, userPrompt)
     }
 
     /**

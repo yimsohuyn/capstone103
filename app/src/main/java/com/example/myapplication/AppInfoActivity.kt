@@ -20,7 +20,7 @@ class AppInfoActivity : AppCompatActivity() {
         }
 
         // 예: 앱 정보 표시
-        binding.tvAppName.text = "Study with me"
+        binding.tvAppName.text = "NotePlan"
         binding.tvVersion.text = "버전 1.0.0"
         binding.tvDeveloper.text = "개발자: 103조"
     }

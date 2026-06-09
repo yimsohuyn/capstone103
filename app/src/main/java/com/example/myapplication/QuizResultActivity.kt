@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -111,7 +112,6 @@ class QuizResultActivity : AppCompatActivity() {
 
         saveWrongQuizzes(wrongList)
 
-        // 생성해서 처음 푼 퀴즈일 때만 학습 통계 반영
         if (savedInstanceState == null && countForAnalyticsStats) {
             QuizStatsStorage.addSession(
                 context = this,
@@ -278,61 +278,70 @@ class QuizResultActivity : AppCompatActivity() {
 
     private fun showWrongNoteDialog() {
 
-        if (wrongList.isEmpty()) {
+        val dialogView =
+            layoutInflater.inflate(
+                R.layout.dialog_wrong_note,
+                null
+            )
 
-            AlertDialog.Builder(this)
-                .setTitle("오답노트")
-                .setMessage("오답이 없습니다.")
-                .setPositiveButton(
-                    "확인",
-                    null
-                )
-                .show()
+        val tvWrongNoteTitle =
+            dialogView.findViewById<TextView>(R.id.tvWrongNoteTitle)
 
-            return
-        }
+        val tvWrongNoteContent =
+            dialogView.findViewById<TextView>(R.id.tvWrongNoteContent)
 
-        val message =
-            buildString {
+        val btnCloseWrongNote =
+            dialogView.findViewById<TextView>(R.id.btnCloseWrongNote)
 
-                wrongList.forEachIndexed {
-                        index,
-                        item ->
+        tvWrongNoteTitle.text = "오답노트"
 
-                    append(
-                        "${index + 1}. ${item.question}\n"
-                    )
+        tvWrongNoteContent.text =
+            if (wrongList.isEmpty()) {
+                "오답이 없습니다."
+            } else {
+                buildString {
+                    wrongList.forEachIndexed { index, item ->
 
-                    append(
-                        "내 답: ${item.selectedAnswerText()}\n"
-                    )
+                        append("${index + 1}. ${item.question}\n")
+                        append("내 답: ${item.selectedAnswerText()}\n")
+                        append("정답: ${item.correctAnswerText()}\n")
+                        append(
+                            "해설: ${
+                                item.explanation.ifBlank {
+                                    "해설 없음"
+                                }
+                            }"
+                        )
 
-                    append(
-                        "정답: ${item.correctAnswerText()}\n"
-                    )
-
-                    append(
-                        "해설: ${
-                            item.explanation.ifBlank {
-                                "해설 없음"
-                            }
-                        }"
-                    )
-
-                    if (index != wrongList.lastIndex) {
-                        append("\n\n")
+                        if (index != wrongList.lastIndex) {
+                            append("\n\n")
+                        }
                     }
                 }
             }
 
-        AlertDialog.Builder(this)
-            .setTitle("오답노트")
-            .setMessage(message)
-            .setPositiveButton(
-                "닫기",
-                null
-            )
-            .show()
+        val dialog =
+            AlertDialog.Builder(this)
+                .setView(dialogView)
+                .create()
+
+        dialog.window?.setBackgroundDrawableResource(
+            android.R.color.transparent
+        )
+
+        btnCloseWrongNote.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
+
+        val width =
+            (resources.displayMetrics.widthPixels * 0.84).toInt()
+
+        dialog.window?.setLayout(
+            width,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
     }
 
     private fun retryWrongAnswers() {

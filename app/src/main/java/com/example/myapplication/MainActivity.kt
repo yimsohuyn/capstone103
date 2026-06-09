@@ -91,7 +91,7 @@ class MainActivity : AppCompatActivity() {
         val data: Uri = intent.data ?: return
 
         val isInviteLink =
-            data.scheme == "studywithme" &&
+            data.scheme == "noteplan" &&
                     data.host == "invite"
 
         if (!isInviteLink) return

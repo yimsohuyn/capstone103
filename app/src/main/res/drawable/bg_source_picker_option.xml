@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 파일 소스 선택 옵션 카드 배경 (ripple 효과 포함) -->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="#20000000">
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/background_secondary" />
+            <corners android:radius="16dp" />
+        </shape>
+    </item>
+</ripple>

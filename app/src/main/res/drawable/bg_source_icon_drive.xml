@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 구글 드라이브 옵션 아이콘 원형 배경 (purple 계열) -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <solid android:color="@color/accent_purple" />
+    <size android:width="44dp" android:height="44dp" />
+</shape>

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 카메라 촬영 이미지를 저장하기 위한 FileProvider 경로 설정 -->
+<paths>
+    <cache-path name="camera_images" path="camera_images/" />
+</paths>
